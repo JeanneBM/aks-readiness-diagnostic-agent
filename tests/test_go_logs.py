@@ -37,6 +37,19 @@ class GoLogTests(unittest.TestCase):
         self.assertEqual(diagnose(evidence).cause, "probe_port_mismatch")
         self.assertEqual(recorder().supporting_log_options(evidence, "port"), [["startup"]])
 
+    def test_committed_actual_text_handler_capture(self):
+        directory = ROOT / "tests/golden"
+        provenance = json.loads((directory / "go-text-handler.provenance.json").read_text())
+        raw = (directory / "go-text-handler.log").read_bytes()
+        self.assertEqual(provenance["log_sha256"], hashlib.sha256(raw).hexdigest())
+        self.assertEqual(provenance["source_sha256"], hashlib.sha256((ROOT / "lab/go/main.go").read_bytes()).hexdigest())
+        for scenario, cause in {"port": "probe_port_mismatch", "path": "probe_path_mismatch",
+                                "dependency": "dependency_unavailable"}.items():
+            with self.subTest(scenario=scenario):
+                evidence = bundle(raw.decode(), provenance["port"], scenario)
+                self.assertEqual(diagnose(evidence).cause, cause)
+                self.assertEqual(recorder().supporting_log_options(evidence, scenario), [["startup"]])
+
     @unittest.skipUnless(os.environ.get("READINESS_GO_CAPTURE"), "requires fresh native Go capture; CI provides it")
     def test_actual_current_binary_output(self):
         directory = Path(os.environ["READINESS_GO_CAPTURE"])

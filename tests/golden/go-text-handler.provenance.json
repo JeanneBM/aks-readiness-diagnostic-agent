@@ -1,0 +1,16 @@
+{
+  "status": "RECORDED",
+  "origin": "native-go-process",
+  "port": 39003,
+  "observed_http_status": {
+    "/live": 200,
+    "/ready": 503,
+    "/unknown": 404
+  },
+  "source_sha256": "60734e75230d8460bbb381d372a040acab53d1dde43d3bb724f1e2ae7f5493b1",
+  "log_sha256": "0cba255b7c97c2fc53a38fe669341d4f8c07b81365d4578f0870bd9e57c97057",
+  "go_version": "go version go1.23.12 linux/amd64",
+  "workflow_run_id": 40381715977,
+  "artifact_id": 12679415721,
+  "commit": "6d77333ea858eb3085ba7cefbe49285cc16e8815"
+}

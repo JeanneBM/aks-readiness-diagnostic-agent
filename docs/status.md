@@ -30,6 +30,8 @@ Follow-up: the Go application now explicitly selects slog.TextHandler. A histori
 
 Local follow-up verification: 44 tests discovered, 43 passed and one native-process test skipped because no fresh compiled Go capture was available. The native-go job supplies that capture; its success must be checked separately before claiming Go integration validation.
 
+Verified CI follow-up: workflow run 40381715977 passed Python 3.11, 3.12 and 3.13 checks and native-go compilation/capture tests. Actual Go process output and provenance were retrieved from artifact 12679415721 and preserved under tests/golden. This confirms the Go log contract and real HTTP status behavior; it does not validate Docker images, kind recording or model quality. After adding that captured-output regression, local verification found 45 tests: 44 passed and one fresh-process test skipped without a local Go toolchain.
+
 The repository contains no credentials and no recorded real customer or cluster evidence. Generated local runs belong under .local and are ignored by Git.
 
 ## Next experiment

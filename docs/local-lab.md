@@ -107,4 +107,4 @@ The second command deletes everything in the named local cluster. Do not reuse a
 
 ## Verification boundary
 
-The Python contracts, metrics, collector behavior and ASGI response logic are tested offline. Docker, kind, kubectl and Go were unavailable in the preparation environment, so container builds, Go compilation and the complete live recording pipeline remain to be verified on the local machine. No recording or model result is pre-populated or claimed.
+The Python contracts, metrics, collector behavior and ASGI response logic are tested offline. Native Go compilation, actual HTTP responses and the log contract passed CI run 40381715977; its real log capture is preserved under tests/golden. Docker, kind and kubectl remain unavailable in the preparation environment, so container builds and the complete Kubernetes recording pipeline still require local verification. No kind recording or model result is pre-populated or claimed.
