@@ -8,7 +8,7 @@ import platform
 import time
 
 from .baseline import diagnose
-from .errors import ContractError, ProviderError
+from .errors import ContractError, ModelNoAnswer, ProviderError
 from .llm import PROMPT, SCHEMA
 from .models import CAUSES, Bundle, Diagnosis
 
@@ -173,6 +173,9 @@ def evaluate(cases_path, output, variants, client=None, manifest=None, repetitio
                         except (ValueError, TypeError, AttributeError):
                             raise ContractError("Invalid diagnostic result") from None
                     row.update(status="OK", diagnosis=result.to_dict(), **score(result, truth))
+                except ModelNoAnswer as error:
+                    row.update(error_kind="MODEL_NO_ANSWER", no_answer_reason=error.reason,
+                               diagnostic_risk=True)
                 except ContractError:
                     row.update(error_kind="CONTRACT_ERROR", diagnostic_risk=True, unsupported_conclusion=True)
                 except ProviderError:
@@ -186,8 +189,8 @@ def evaluate(cases_path, output, variants, client=None, manifest=None, repetitio
     save("consistency.json", consistent)
     summary = {"schema": 2, "cases": len(cases), "repetitions": repetitions, "variants": {}}
     lines = ["# Replay results", "", "Recorded diagnostic results; no live repair or human approval implied.", "",
-             "| Variant | Cases | Majority-correct | Attempts | Errors | Diagnostic risk attempts | Model calls |",
-             "| --- | ---: | ---: | ---: | ---: | ---: | ---: |"]
+             "| Variant | Cases | Majority-correct | Attempts | Errors | Invalid output | No answer | Conservative risk | Model calls |",
+             "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"]
     for variant in variants:
         data = [x for x in rows if x["variant"] == variant]
         cases_data = [x for x in consistent if x["variant"] == variant]
@@ -196,6 +199,10 @@ def evaluate(cases_path, output, variants, client=None, manifest=None, repetitio
                  "correct_attempts": sum(x.get("cause_correct", False) for x in data),
                  "errors": sum(x["status"] == "ERROR" for x in data),
                  "contract_errors": sum(x.get("error_kind") == "CONTRACT_ERROR" for x in data),
+                 "model_no_answers": sum(x.get("error_kind") == "MODEL_NO_ANSWER" for x in data),
+                 "refusals": sum(x.get("no_answer_reason") == "refusal" for x in data),
+                 "truncated_outputs": sum(x.get("no_answer_reason") == "truncated" for x in data),
+                 "filtered_outputs": sum(x.get("no_answer_reason") == "filtered" for x in data),
                  "provider_errors": sum(x.get("error_kind") == "PROVIDER_ERROR" for x in data),
                  "unsupported_conclusions": sum(x["unsupported_conclusion"] for x in data),
                  "diagnostic_risk_attempts": sum(x["diagnostic_risk"] for x in data),
@@ -215,7 +222,7 @@ def evaluate(cases_path, output, variants, client=None, manifest=None, repetitio
             "correct_attempts": sum(x["framework"] == framework and x.get("cause_correct", False) for x in data)}
             for framework in sorted({x["framework"] for x in data})}
         summary["variants"][variant] = entry
-        lines.append(f"| {variant} | {entry['cases']} | {entry['correct']} | {entry['attempts']} | {entry['errors']} | {entry['diagnostic_risk_attempts']} | {entry['model_calls']} |")
+        lines.append(f"| {variant} | {entry['cases']} | {entry['correct']} | {entry['attempts']} | {entry['errors']} | {entry['contract_errors']} | {entry['model_no_answers']} | {entry['diagnostic_risk_attempts']} | {entry['model_calls']} |")
     summary["paired_comparisons"] = {v: paired_comparison(consistent, v)
                                      for v in variants if v != "A1" and "A1" in variants}
     save("summary.json", summary)

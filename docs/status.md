@@ -26,6 +26,10 @@ No live model call, cluster collection, cloud provisioning or automatic mutation
 
 Docker, kind, kubectl and Go were unavailable here. Container builds, Go compilation and the full eight-case recording pipeline require local verification; no fabricated recording results are committed. Entra authentication and a multi-step C2 tool loop remain outside the current implementation.
 
+Follow-up: the Go application now explicitly selects slog.TextHandler. A historical real-output golden regression and a native-go CI capture check guard the baseline/recorder log contract. Refusals and truncated/filtered output are reported separately from invalid diagnoses; the conservative risk aggregate remains explicit. The development recorder must not be used as a natural-log held-out generator.
+
+Local follow-up verification: 44 tests discovered, 43 passed and one native-process test skipped because no fresh compiled Go capture was available. The native-go job supplies that capture; its success must be checked separately before claiming Go integration validation.
+
 The repository contains no credentials and no recorded real customer or cluster evidence. Generated local runs belong under .local and are ignored by Git.
 
 ## Next experiment

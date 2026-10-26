@@ -39,6 +39,14 @@ Application readiness checks actually request the separate dependency over HTTP.
 
 The application logs its configured readiness route explicitly. That route message is application-provided evidence, not framework magic or independent proof. The baseline includes known development patterns for both frameworks. Matching these eight cases does not show generalization.
 
+Go explicitly installs slog.TextHandler on stdout. Both the fixed format and the previous default startup format are supported by the baseline and recorder. To compile the current application and capture actual logs without Docker, use a new output directory:
+
+```bash
+python tools/capture_go_logs.py --output .local/go-capture
+```
+
+This requires a local Go toolchain. The native-go CI job runs the same capture, checks its source/log hashes and verifies both baseline diagnosis and recorder evidence selection against the actual output. Generated logs are artifacts, not manually fabricated expected strings. The committed historical startup golden line came from the real review output.
+
 The recorder writes:
 
 - evidence/R001.json through R008.json: bounded, sanitized inputs.

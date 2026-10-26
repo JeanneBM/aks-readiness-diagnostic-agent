@@ -14,6 +14,8 @@ func setting(key, fallback string) string {
 }
 
 func main() {
+	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, nil)))
+	address := ":" + setting("PORT", "8080")
 	path := setting("READY_PATH", "/ready")
 	dependency := setting("DEPENDENCY_URL", "http://dependency:8080/health")
 	role := setting("ROLE", "api")
@@ -39,7 +41,7 @@ func main() {
 			fmt.Fprintln(w, "ready")
 		})
 	}
-	slog.Info("starting HTTP server", "address", ":8080", "readiness_path", path, "role", role)
-	server := &http.Server{Addr: ":8080", Handler: mux, ReadHeaderTimeout: 3 * time.Second}
+	slog.Info("starting HTTP server", "address", address, "readiness_path", path, "role", role)
+	server := &http.Server{Addr: address, Handler: mux, ReadHeaderTimeout: 3 * time.Second}
 	if err := server.ListenAndServe(); err != nil { slog.Error("server stopped", "err", err); os.Exit(1) }
 }

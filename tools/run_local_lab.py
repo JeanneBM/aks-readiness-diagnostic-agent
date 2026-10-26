@@ -111,6 +111,15 @@ def wait_for_fault(cluster, pod, scenario, seconds=90):
     raise ValueError("Expected fault was not observed; no diagnostic label will be published")
 
 
+def supporting_log_options(bundle, scenario):
+    needles = {"port": ("Uvicorn running on", 'msg="starting HTTP server"', "INFO starting HTTP server address="),
+               "path": ("Readiness route registered:", "readiness_path="),
+               "dependency": ("Readiness dependency inventory unavailable", 'msg="dependency check failed"',
+                              "ERROR dependency check failed dependency=")}[scenario]
+    return [[o.id] for o in bundle.observations if o.kind == "app_log"
+            and any(needle in o.text for needle in needles)]
+
+
 def record(cluster, output, create_cluster):
     preflight()
     output = Path(output).resolve()
@@ -169,11 +178,7 @@ def record(cluster, output, create_cluster):
                          "required_evidence_ids": ids, "split": "dev", "origin": "local-kind-recorded",
                          "framework": framework, "scenario": scenario}
                 if scenario != "healthy":
-                    needles = {"port": ("Uvicorn running on", 'msg="starting HTTP server"'),
-                               "path": ("Readiness route registered:", "readiness_path="),
-                               "dependency": ("Readiness dependency inventory unavailable", 'msg="dependency check failed"')}[scenario]
-                    options = [[o.id] for o in bundle.observations if o.kind == "app_log"
-                               and any(needle in o.text for needle in needles)]
+                    options = supporting_log_options(bundle, scenario)
                     if not options:
                         raise ValueError("Cause-supporting application evidence is absent")
                     label["required_evidence_ids"] = ["events"] if scenario == "dependency" else ["probe", "events"]

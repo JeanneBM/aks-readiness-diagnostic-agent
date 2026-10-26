@@ -25,6 +25,7 @@ def diagnose(bundle):
                 listeners = re.findall(r"Listening on 0\.0\.0\.0:(\d+)\b", log.text)
                 listeners += re.findall(r"Uvicorn running on http://(?:0\.0\.0\.0|127\.0\.0\.1):(\d+)\b", log.text)
                 listeners += re.findall(r'msg="starting HTTP server" address=:(\d+)\b', log.text)
+                listeners += re.findall(r'\bINFO starting HTTP server address=:(\d+)\b', log.text)
                 routes = re.findall(r"Readiness endpoint: (/[^\s]+)", log.text)
                 routes += re.findall(r"Readiness route registered: GET (/[^\s]+)", log.text)
                 routes += re.findall(r'readiness_path=(/[^\s"]+)', log.text)
@@ -41,7 +42,7 @@ def diagnose(bundle):
     for failure in failures:
         if "statuscode: 503" in failure.text.lower():
             for log in logs:
-                match = re.search(r'Dependency check failed: ([a-zA-Z0-9_-]+)\b|Readiness dependency ([a-zA-Z0-9_-]+) unavailable|msg="dependency check failed" dependency=([a-zA-Z0-9_-]+)', log.text)
+                match = re.search(r'Dependency check failed: ([a-zA-Z0-9_-]+)\b|Readiness dependency ([a-zA-Z0-9_-]+) unavailable|(?:msg="dependency check failed"|ERROR dependency check failed) dependency=([a-zA-Z0-9_-]+)', log.text)
                 if match:
                     candidates.append(("dependency_unavailable", [failure.id, log.id],
                                        "Application readiness reports a failed dependency check.",

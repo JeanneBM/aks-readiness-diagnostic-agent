@@ -22,14 +22,17 @@ Labels describe the injected setup and require human verification. Missing requi
 | rubric_evidence_covered | Required and alternative citation rubric satisfied; null if not applicable |
 | rubric_evidence_applicable | Denominator for evidence-rubric coverage, including failed responses on applicable cases |
 | unsupported_conclusion | Wrong/non-supported non-abstaining conclusion, or contract-invalid output |
-| diagnostic_risk | Includes unsupported conclusions and every contract error, including fabricated citations |
+| diagnostic_risk | Conservative composite: unsupported conclusions, invalid output and no completed answer; inspect its separate components |
 | PROVIDER_ERROR | HTTP/transport failure without a usable response; counts as incorrect, reported separately from diagnostic risk |
-| CONTRACT_ERROR | Invalid, refused, incomplete or fabricated output; counts as incorrect and diagnostic risk |
+| CONTRACT_ERROR | Invalid or fabricated output; counts as incorrect and diagnostic risk |
+| MODEL_NO_ANSWER | Refusal, truncation, filtering or incomplete generation; no completed diagnosis, not labeled an unsupported conclusion |
 | EXECUTION_ERROR | Other adapter/runtime failure; counts as incorrect, remains visible |
 | usage | Only tokens actually reported; missing usage is not zero cost |
 | seconds | Wall time for one diagnosis attempt |
 
 Existing IDs and a matching cause do not prove that prose or recommendations are sound. Human review remains necessary. Recommendations are not executed.
+
+summary.md exposes Invalid output and No answer separately. summary.json additionally reports refusals, truncated_outputs and filtered_outputs. The conservative risk aggregate still includes non-answers to avoid silently relaxing the frozen decision rule. It must not be described as the rate of wrong diagnoses or harmful actions. A later study may preregister separate risk/availability thresholds, but must not change them after observing held-out outcomes.
 
 ## Repetitions and paired inference
 
@@ -49,6 +52,10 @@ Summary correctness and McNemar use one aggregate result per case, never repeate
 6. Preserve all results. Tuning after inspection starts a new named experiment.
 
 Legacy schema-1 manifests must be regenerated. Hashes detect accidental drift; they do not prove chronology or independent authorship, prevent data access, or stop someone from deliberately regenerating a development freeze after peeking at held-out.
+
+### Held-out label policy
+
+The current Uvicorn/Go recorder is strictly a development fixture tool, not a held-out generator. For future natural-log cohorts, keep the injected fault as separate metadata and label only what the available evidence supports. A missing readiness-route observation may require insufficient_evidence rather than the hidden injected cause. Do not require held-out applications to emit helper route lines, or discard cases simply because their logs do not match development patterns. Continue collecting other cases while preserving per-case collection failures. That generalized recorder is not implemented yet.
 
 Model configuration includes request parameter names and temperature omission. A deployment name does not pin the provider's immutable model version; preserve deployment metadata separately.
 
