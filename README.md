@@ -56,6 +56,18 @@ A1 is the initial transparent baseline, not a claim of the strongest possible ru
 
 The 18 committed fixtures are synthetic development examples, including ambiguous and injected-instruction cases. Passing them checks implementation consistency, not generalization or prompt-injection resistance.
 
+## Local framework pilot
+
+Uvicorn and Go applications, a separate HTTP dependency and a cross-platform recorder are provided under lab and tools. Start by checking local prerequisites:
+
+```bash
+python tools/run_local_lab.py check
+```
+
+Then follow docs/local-lab.md to record three faults plus a healthy control per framework on a dedicated kind cluster. Both variants replay the same actual recordings; no Azure provisioning is needed. Container builds and the full kind recording flow still require local verification.
+
+Evaluation supports 1–10 repetitions, per-case agreement and schema-2 development preregistration for new held-out data. Contract-invalid model output, including invented evidence IDs, counts as diagnostic risk; provider failures remain separate errors.
+
 ## Repository contents
 
 | Path | Purpose |
@@ -66,6 +78,9 @@ The 18 committed fixtures are synthetic development examples, including ambiguou
 | tools/generate_dev_fixtures.py | Reproduce development fixtures in a new directory |
 | tests | Offline contract, replay, collector and provider-adapter tests |
 | demo | Disposable application, Dockerfile and Pod manifest |
+| lab | Uvicorn and Go development workloads with a real HTTP dependency |
+| tools/run_local_lab.py | Local preflight, recording, pilot replay and cleanup |
+| docs/local-lab.md | Exact local pilot commands and verification limits |
 | docs/usage.md | Commands and operating limits |
 | docs/evaluation.md | Scoring, freezing and experiment boundaries |
 | docs/phase-2.md | Broader experiment design and staged expansion |
