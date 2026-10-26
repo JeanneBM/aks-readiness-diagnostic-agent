@@ -23,7 +23,11 @@ def diagnose(bundle):
         for failure in failures:
             for log in logs:
                 listeners = re.findall(r"Listening on 0\.0\.0\.0:(\d+)\b", log.text)
+                listeners += re.findall(r"Uvicorn running on http://(?:0\.0\.0\.0|127\.0\.0\.1):(\d+)\b", log.text)
+                listeners += re.findall(r'msg="starting HTTP server" address=:(\d+)\b', log.text)
                 routes = re.findall(r"Readiness endpoint: (/[^\s]+)", log.text)
+                routes += re.findall(r"Readiness route registered: GET (/[^\s]+)", log.text)
+                routes += re.findall(r'readiness_path=(/[^\s"]+)', log.text)
                 if (listeners and "connection refused" in failure.text.lower()
                         and all(int(p) != value["port"] for p in listeners)):
                     candidates.append(("probe_port_mismatch", [config.id, failure.id, log.id],
@@ -37,7 +41,7 @@ def diagnose(bundle):
     for failure in failures:
         if "statuscode: 503" in failure.text.lower():
             for log in logs:
-                match = re.search(r"Dependency check failed: ([a-zA-Z0-9_-]+)\b", log.text)
+                match = re.search(r'Dependency check failed: ([a-zA-Z0-9_-]+)\b|Readiness dependency ([a-zA-Z0-9_-]+) unavailable|msg="dependency check failed" dependency=([a-zA-Z0-9_-]+)', log.text)
                 if match:
                     candidates.append(("dependency_unavailable", [failure.id, log.id],
                                        "Application readiness reports a failed dependency check.",
@@ -45,7 +49,7 @@ def diagnose(bundle):
     healthy = [o for o in bundle.observations if o.kind == "pod_status" and o.text == "Ready=True"]
     unready = [o for o in bundle.observations if o.kind == "pod_status" and o.text == "Ready=False"]
     causes = {c[0] for c in candidates}
-    if len(causes) == 1 and not healthy:
+    if len(causes) == 1 and not healthy and not any(o.id == "container-scope" for o in bundle.observations):
         cause, ids, summary, advice = candidates[0]
         return Diagnosis(cause, summary, tuple(ids), advice,
                          "Snapshot-level inference; logs may be stale or misleading. Verify before changing configuration.")

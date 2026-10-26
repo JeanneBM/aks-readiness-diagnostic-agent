@@ -1,56 +1,65 @@
 # Evaluation protocol
 
-## Research question
+## Question and scope
 
-Does model-assisted diagnosis improve top-1 cause accuracy over a credible rules baseline on independently prepared evidence, without increasing unsupported conclusions?
+Does model-assisted diagnosis improve top-1 cause accuracy over a credible rules baseline, without increasing unsupported conclusions? This repository evaluates diagnosis, not executed repair or action safety.
 
-This version evaluates diagnosis only. A recommended action is not executed. Therefore action coverage, executed-action risk, reversibility and rollback effectiveness cannot be measured here.
+The committed 18 synthetic fixtures are regression tests. Recorded Uvicorn/Go cases are development data. Neither is an independent benchmark. Framework conventions alone do not establish a listening port or an enabled endpoint.
 
-## Data contract
+## Inputs and labels
 
-An evidence JSON contains schema=1, a generic target and observations. Each observation has a unique id, kind, source and text. Supported kinds: pod_status, probe_config, probe_result, app_log and limitation. Text is bounded per item and per bundle.
+Evidence contains schema=1, a generic target and observations with id, kind, source and text. Labels are stored separately. They contain cause, required_evidence_ids, split and origin; optional framework/scenario fields remain outside the model input.
 
-Keep the matching label in labels, with cause, required_evidence_ids, split and origin. Filenames join evidence and labels; labels are not passed to the model. Do not put the ground truth in the target, observation IDs or sources.
+Optional evidence_options lists alternative citation groups: all required_evidence_ids and at least one complete alternative group must be cited. This avoids penalizing an answer that cites an equally valid startup or recent-log observation.
 
-Development fixtures are transparent and synthetic. They deliberately exercise supported patterns, contradictions, missing context and injected instructions. They are not unseen cases and not a realistic benchmark.
+Labels describe the injected setup and require human verification. Missing required evidence makes recording fail rather than silently inventing support.
 
-## Scoring
+## Metrics and errors
 
-| Field | Meaning |
+| Metric | Meaning |
 | --- | --- |
-| cause_correct | Exact taxonomy match against ground truth; abstention is correct only for an ambiguous case |
-| rubric_evidence_covered | All required evidence IDs were cited; a proxy, not semantic entailment |
-| appropriate_abstention | Whether an ambiguous case received insufficient_evidence; null on other cases |
-| unsupported_conclusion | A non-abstaining conclusion with the wrong cause or missing required citations |
-| ERROR | Provider/contract failure, including fabricated evidence IDs; never scored as a successful abstention |
-| seconds | End-to-end diagnosis time for the variant on the recorded bundle |
-| usage | Token totals actually reported by the provider; missing usage is not proof of zero cost |
+| cause_correct | Exact top-1 taxonomy match; abstention is correct only on an ambiguous case |
+| rubric_evidence_covered | Required and alternative citation rubric satisfied; null if not applicable |
+| rubric_evidence_applicable | Denominator for evidence-rubric coverage, including failed responses on applicable cases |
+| unsupported_conclusion | Wrong/non-supported non-abstaining conclusion, or contract-invalid output |
+| diagnostic_risk | Includes unsupported conclusions and every contract error, including fabricated citations |
+| PROVIDER_ERROR | HTTP/transport failure without a usable response; counts as incorrect, reported separately from diagnostic risk |
+| CONTRACT_ERROR | Invalid, refused, incomplete or fabricated output; counts as incorrect and diagnostic risk |
+| EXECUTION_ERROR | Other adapter/runtime failure; counts as incorrect, remains visible |
+| usage | Only tokens actually reported; missing usage is not zero cost |
+| seconds | Wall time for one diagnosis attempt |
 
-Contract validation rejects unknown/duplicate citations, unknown causes and extra output fields. Recommendations remain unvalidated text. A correct cause and valid references do not guarantee that the prose or recommendation is sound. A human reviewer must judge that separately.
+Existing IDs and a matching cause do not prove that prose or recommendations are sound. Human review remains necessary. Recommendations are not executed.
 
-Summary JSON includes per-cause results and paired A1/C1 or A1/H comparisons. The exact two-sided McNemar calculation tests paired cause correctness, with errors counted as incorrect. It does not test safety, action risk or recommendation quality. Do not search many subsets and report only a favorable p-value.
+## Repetitions and paired inference
 
-## Freeze order
+Use --repetitions 3 for a pilot; supported range is 1–10. Record each attempt separately. C1 and H make independent requests; a maximum of two model calls per case/repetition is possible when both are selected.
 
-1. Develop fixtures, rules and prompts on data/dev. Use comparable effort for A1 and model prompts.
-2. Review the cause taxonomy, label rubric and thresholds before the final evaluation.
-3. Commit the frozen implementation and preserve a development freeze manifest.
-4. Have an independent preparer create new held-out evidence and labels after that freeze. Include unknown formulations, noisy/stale messages, healthy controls and cases where there is insufficient evidence.
-5. Produce a second run manifest over the held-out data. Verify that code/prompt/config hashes match the earlier freeze; only dataset hashes should differ. Preserve both manifests.
-6. Run the held-out comparison once. Preserve every error and result. Any tuning afterward starts a separately named experiment.
+consistency.json reports valid-response counts, cause counts, cause agreement and the absolute-majority cause. Agreement is the most frequent valid cause count divided by all attempts. Errors therefore reduce agreement. No absolute majority means the case is incorrect for the primary comparison.
 
-The CLI requires a matching manifest if labels say held-out. It does not enforce independent authorship, prevent local dataset access or cryptographically prove chronology. Those are procedural requirements, not implemented guarantees.
+Summary correctness and McNemar use one aggregate result per case, never repeated requests as independent samples. Risk is reported both by attempt and by cases with any risky response. Review per-cause and per-framework breakdowns alongside the aggregate.
 
-## Proposed decision rule for the diagnostic stage
+## Freeze order and held-out validation
 
-Freeze these thresholds before held-out preparation: C1 or H should improve cause accuracy by at least 15 percentage points over A1, increase unsupported conclusions by no more than 2 percentage points, and have paired exact McNemar p below 0.05. Also inspect evidence support and every high-impact incorrect recommendation.
+1. Develop and review rules, prompts and scoring on development data, with comparable effort for both variants.
+2. Commit the implementation and preserve a schema-2 development freeze manifest before independent held-out preparation.
+3. Prepare new evidence and labels independently. Use separate cohorts for new examples of known frameworks and entirely unseen frameworks; do not pool them to claim one kind of generalization.
+4. Replay held-out using --manifest pointing to that earlier development freeze. Code, prompt, schema, runtime and provider settings must match. Only data hashes and data_splits may differ.
+5. The runner saves the original freeze as preregistration.json and new data hashes as manifest.json. A held-out manifest cannot serve as its own preregistration. Development replays still require full manifest equality.
+6. Preserve all results. Tuning after inspection starts a new named experiment.
 
-These are proposed project criteria, not a statistical power guarantee. Choose sample size after a pilot and paired-disagreement assessment. Eighteen development fixtures cannot establish this result.
+Legacy schema-1 manifests must be regenerated. Hashes detect accidental drift; they do not prove chronology or independent authorship, prevent data access, or stop someone from deliberately regenerating a development freeze after peeking at held-out.
 
-If diagnosis does not improve but explanations are useful under blinded human review, consider an explanation-only tool. If neither improves, retain rules and stop expansion. Passing this gate never enables live mutation: action safety requires a separate experiment.
+Model configuration includes request parameter names and temperature omission. A deployment name does not pin the provider's immutable model version; preserve deployment metadata separately.
 
-## Evidence provenance and remaining work
+## Proposed decision gate
 
-The collector records selected sources but v1 does not include item timestamps, trust classifications, previous logs, revision diffs or metrics. It also cannot isolate which container produced a Pod-level readiness Event in a multi-container Pod. Use single-container demo Pods for the initial live replay.
+Before held-out creation, freeze a target of at least +15 percentage points in case-level majority-correct accuracy, no more than +2 percentage points in diagnostic-risk cases, and exact paired McNemar p below 0.05. These are project criteria, not a sample-size or statistical-power guarantee.
 
-Kubernetes API origin does not make log or Event text trustworthy. Explicit provenance, chronology and stronger snapshot recording are prerequisites for the broader phase-2 study. Treat current bundles as diagnostic inputs, not signed incident records.
+Never apply this gate to eight development recordings or the synthetic regression suite. Use a pilot to plan a sufficiently sized independent study. Assess explanation quality separately under blinded human review. A diagnostic win never authorizes live mutation.
+
+## Remaining evidence limits
+
+The collector now retains a bounded startup prefix and recent logs separately, reports empty windows, and sorts Events by timestamps. Original startup may already be rotated away; Pod-level Events may be ambiguous for multi-container Pods. Baseline fault conclusions abstain on that ambiguity.
+
+Reads are sequential, not atomic. Source text remains untrusted. Explicit item-level trust metadata, richer revision histories, previous-container logs and metrics remain future work.

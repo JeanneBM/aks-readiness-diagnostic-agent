@@ -23,11 +23,11 @@ Set these environment variables locally. Never commit credentials.
 | READINESS_MODEL | Azure deployment name or OpenAI model identifier |
 | READINESS_API_VERSION | Azure API version; default 2024-10-21 |
 
-Use a model supporting Chat Completions, strict JSON schema output, temperature and max_tokens. Not all provider models or Azure regions are supported. This version uses API keys; managed identity is not implemented.
+Use a model supporting Chat Completions and strict JSON schema output. For deployments requiring newer request parameters, set READINESS_TOKEN_PARAMETER=max_completion_tokens and READINESS_TEMPERATURE=omit. Defaults remain max_tokens and temperature zero. No automatic parameter fallback or retry is performed. This version uses API keys; Entra/managed identity remains unimplemented.
 
 ```bash
 python -m readiness_agent.cli diagnose data/dev/evidence/D001.json --variant C1 --allow-model-calls
-python -m readiness_agent.cli evaluate --cases data/dev --variants A1,C1,H --allow-model-calls --output .local/runs/paired-dev-001
+python -m readiness_agent.cli evaluate --cases data/dev --variants A1,C1,H --repetitions 3 --allow-model-calls --output .local/runs/paired-dev-001
 ```
 
 C1 and H are independent runs; H can make an additional request on cases where A1 abstains. Temperature zero does not guarantee deterministic output. There are no warm-up requests or retries. HTTP errors, timeouts, refusals and malformed outputs remain errors. The request timeout is 45 seconds; full runs can take much longer.
@@ -41,7 +41,7 @@ python -m readiness_agent.cli freeze --cases data/dev --output .local/frozen-dev
 python -m readiness_agent.cli evaluate --cases data/dev --variants A1 --manifest .local/frozen-dev.json --output .local/runs/frozen-dev-001
 ```
 
-For model runs, freeze with --include-model-config and use the same provider configuration during replay. Hashes cover package source, JSON cases, prompt and output schema. The manifest also records Python version and model configuration. This detects drift; it does not certify independent held-out preparation.
+For model runs, freeze with --include-model-config. Schema-2 manifests separate dataset identity from the frozen implementation. Held-out replay uses the earlier development manifest: code, prompt, runtime and model settings must match, while new dataset hashes are recorded separately. Development replay still requires full equality. Old schema-1 manifests must be regenerated. This detects drift, not independent authorship or chronology.
 
 ## Optional cluster collection
 
@@ -54,7 +54,7 @@ python -m readiness_agent.cli diagnose .local/bundles/demo-001.json
 
 Reads: named Pod, namespace Events filtered by Pod UID, and named-container logs. Required permissions are supplied externally: pods get, events list, pods/log get. No RBAC is granted by the repository.
 
-Only selected HTTP probe configuration and Pod status are retained. Environment values, annotations, Secret objects, raw Pod objects and node addresses are excluded. Logs are bounded to 100 lines, 16 KB and ten minutes. Event text is bounded but may contain older failures. Collection is sequential, not atomic. Previous-container logs, rollout history, metrics and dependency probes are not yet collected.
+Only selected HTTP probe configuration and Pod status are retained. Environment values, annotations, Secret objects, raw Pod objects and node addresses are excluded. Recent logs are bounded to 100 lines, 16 KB and ten minutes. A separate streaming read retains the first 16 KB of available current-container logs without a recent-window filter; it has a parent timeout and stops reading at the budget. Empty, unavailable and truncated windows are explicit limitations. Original startup can still be lost to log rotation. Events are sorted by their latest observation timestamp before selecting ten messages. Collection is sequential, not atomic. Previous-container logs, rollout history and metrics are not yet collected.
 
 Inspect bundles before sending them to a provider. Redaction handles common credential patterns but cannot recognize every secret, hostname or personal detail. All evidence text is treated as untrusted. There is no execution path for recommendations.
 

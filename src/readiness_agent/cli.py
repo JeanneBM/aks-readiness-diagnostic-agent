@@ -6,7 +6,7 @@ import sys
 
 from .baseline import diagnose
 from .collector import collect
-from .evaluation import evaluate, fingerprint, digest
+from .evaluation import evaluate, fingerprint, model_configuration
 from .llm import ModelClient
 from .models import load_bundle
 
@@ -32,6 +32,7 @@ def main(argv=None):
     ev.add_argument("--variants", default="A1")
     ev.add_argument("--allow-model-calls", action="store_true")
     ev.add_argument("--manifest")
+    ev.add_argument("--repetitions", type=int, default=1)
     freeze = sub.add_parser("freeze")
     freeze.add_argument("--cases", default="data/dev")
     freeze.add_argument("--output", required=True)
@@ -51,8 +52,7 @@ def main(argv=None):
             config = None
             if args.include_model_config:
                 c = ModelClient.from_env()
-                config = {"provider": c.provider, "model": c.model, "api_version": c.api_version,
-                          "endpoint_sha256": digest(c.endpoint.encode()), "temperature": 0, "max_tokens": 700}
+                config = model_configuration(c)
             write_new(args.output, fingerprint(Path(args.cases), config))
         else:
             variants = args.variants.split(",") if args.command == "evaluate" else [args.variant]
@@ -62,7 +62,7 @@ def main(argv=None):
                     raise ValueError("Use --allow-model-calls for chargeable provider requests")
                 client = ModelClient.from_env()
             if args.command == "evaluate":
-                result = evaluate(args.cases, args.output, variants, client, args.manifest)
+                result = evaluate(args.cases, args.output, variants, client, args.manifest, args.repetitions)
                 print(json.dumps(result, indent=2))
                 return 1 if any(x["errors"] for x in result["variants"].values()) else 0
             bundle = load_bundle(args.bundle)

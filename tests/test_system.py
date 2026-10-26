@@ -88,7 +88,7 @@ class ReplayTests(unittest.TestCase):
             result = evaluate(CASES, output, ["A1", "C1"], Broken())
             self.assertEqual(result["variants"]["C1"]["errors"], 18)
             self.assertEqual(result["variants"]["A1"]["correct"], 18)
-            self.assertNotIn("sensitive-provider-body", (output / "D001-C1.json").read_text())
+            self.assertNotIn("sensitive-provider-body", (output / "D001-C1-r001.json").read_text())
 
     def test_cascade_calls_only_on_rule_abstention(self):
         class Echo:
@@ -162,7 +162,8 @@ class CollectorTests(unittest.TestCase):
             else:
                 data = "Listening on 0.0.0.0:9000\npassword=confidential\n"
             return subprocess.CompletedProcess(command, 0, data, "")
-        bundle = collect("lab", "readiness-lab", "pod", "api", run)
+        bundle = collect("lab", "readiness-lab", "pod", "api", run,
+                         prefix_reader=lambda args: ("Listening on 0.0.0.0:9000", False))
         serialized = json.dumps(bundle.to_dict())
         self.assertNotIn("do-not-export", serialized)
         self.assertNotIn("confidential", serialized)
