@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "target": "demo/api",
+  "observations": [
+    {
+      "id": "status",
+      "kind": "pod_status",
+      "source": "synthetic/pod/status",
+      "text": "Ready=False"
+    },
+    {
+      "id": "probe",
+      "kind": "probe_config",
+      "source": "synthetic/pod/spec",
+      "text": "{\"port\": 8000, \"path\": \"/ready\", \"scheme\": \"HTTP\"}"
+    },
+    {
+      "id": "events",
+      "kind": "probe_result",
+      "source": "synthetic/events",
+      "text": "Readiness probe failed: dial tcp: connection refused"
+    },
+    {
+      "id": "logs",
+      "kind": "app_log",
+      "source": "synthetic/application",
+      "text": "Listening on 0.0.0.0:3000\nStartup completed."
+    }
+  ]
+}

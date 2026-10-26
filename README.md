@@ -1,59 +1,81 @@
 # AKS Readiness Diagnostic Agent
 
-> Evidence-backed diagnosis of Kubernetes readiness failures. Read-only first; evaluated against a deterministic baseline.
+**Can an LLM explain readiness failures better than explicit rules using the same evidence?**
 
-## Goal
+A runnable, read-only diagnostic experiment with an explicit baseline, optional model adapter, rules-to-model cascade, recorded-evidence replay, bounded Kubernetes collector and disposable demo application.
 
-Given the same Kubernetes evidence, determine whether an LLM can identify the cause of an application remaining unready more accurately than explicit rules.
+**Status:** development implementation with synthetic fixtures. No held-out LLM advantage, live AKS validation or automated repair is claimed.
 
-This repository starts a new experiment. It does not claim that an LLM is necessary, that diagnosis is validated, or that automated remediation is supported.
+## Scope
 
-## Scope of the first experiment
+| Input | Output |
+| --- | --- |
+| Pod readiness state, HTTP probe configuration, readiness failure Events and application logs | Proposed cause, evidence IDs, recommendation and uncertainty |
+| Missing, ambiguous or conflicting evidence | Explicit insufficient-evidence outcome |
 
-| Fault class | Evidence to inspect | Expected result |
-| --- | --- | --- |
-| Incorrect readiness probe port | Probe configuration, listening-port evidence and probe failures | Identify the mismatch and cite the supporting evidence. |
-| Incorrect readiness probe path | Probe configuration, HTTP responses and application route/log evidence | Identify the mismatch when evidence is sufficient. |
-| Unavailable application dependency | Application logs, readiness responses and dependency configuration | Identify the dependency failure, or abstain when its cause is ambiguous. |
+Initial causes: incorrect probe port, incorrect probe path and unavailable application dependency. Healthy and ambiguous controls are included. A dependency failure diagnosis does not establish whether DNS, networking, credentials or the service itself caused it.
 
-A declared container port alone does not establish that the process listens on it. HTTP 404 alone does not establish the correct readiness path. A dependency timeout alone does not distinguish DNS, networking, credentials and service availability.
+There is no mutation executor. Recommendations are text, never executed commands.
 
-## Diagnostic contract
+## Start offline
 
-Each diagnostic result must contain:
+Python 3.11 or newer. Run from the repository root:
 
-- A proposed cause, or an explicit insufficient-evidence outcome.
-- References to concrete evidence items supporting the conclusion.
-- A recommended next check or corrective action.
-- Relevant uncertainty and alternative explanations.
+```bash
+python -m venv .venv
+```
 
-The diagnostic agent must not modify workloads, restart Pods, change permissions or execute its recommendations. Logs and Events are untrusted data, not instructions. Do not collect Kubernetes Secret objects or publish raw logs containing credentials.
+Activate on Windows Git Bash with `source .venv/Scripts/activate`, or on Linux/macOS with `source .venv/bin/activate`. Then:
 
-## Evaluation before expansion
+```bash
+python -m pip install -e .
+python -m unittest discover -s tests -v
+python -m readiness_agent.cli diagnose data/dev/evidence/D001.json
+python -m readiness_agent.cli evaluate --cases data/dev --variants A1 --output .local/runs/dev-001
+```
 
-1. Define fixtures, ground truth and scoring before tuning the agent.
-2. Implement an explicit deterministic baseline for the same three fault classes.
-3. Give A (rules) and C (LLM) identical evidence bundles.
-4. Separate development cases from held-out variants; include healthy and ambiguous controls.
-5. Measure cause accuracy, evidence support, appropriate abstention, latency and token usage.
-6. Preserve failures and inspect outputs against ground truth.
+Default commands make no Kubernetes or model requests. Existing result directories are never overwritten.
 
-Report results by fault class and overall. Do not treat all abstentions as success, or pool revised prompts and fixtures into one frozen evaluation.
+## Variants
 
-**Decision gate:** expand model-assisted diagnosis only if the held-out comparison demonstrates useful benefit. If rules solve these cases equally well, retain the simpler solution and report that result.
+| Variant | Implementation |
+| --- | --- |
+| A1 | Explicit rules over the recorded bundle; abstains outside known patterns |
+| C1 | One model request over the same bundle |
+| H | A1 first; C1 only when A1 abstains |
 
-## Planned implementation
+A1 is the initial transparent baseline, not a claim of the strongest possible rules engine. Improve rules and prompts on development data with comparable effort before freezing them. Model requests require provider configuration and an explicit flag.
 
-- Evidence bundle schema and sanitized fixture loader.
-- Read-only collector for workload state, Events, probe configuration and bounded application logs.
-- Deterministic diagnostic baseline.
-- Model-assisted diagnostic adapter.
-- Evaluation runner and concise findings report.
+## Evaluation rules
 
-No collector, model integration, runnable CLI or deployment is implemented yet. No Azure provisioning is required to define and test the offline experiment.
+- Keep ground truth in separate label files. Models receive evidence only.
+- Freeze rules, prompts and scoring before independent held-out preparation.
+- Preserve provider and contract failures as ERROR, not correct abstentions.
+- Measure cause accuracy, evidence-rubric coverage, abstention, unsupported conclusions, latency and reported tokens.
+- Existing evidence IDs do not prove semantic support. Human review remains necessary.
 
-## Relationship to the previous PoC
+The 18 committed fixtures are synthetic development examples, including ambiguous and injected-instruction cases. Passing them checks implementation consistency, not generalization or prompt-injection resistance.
 
-[Azure Kubernetes Agentic Ops evaluation](https://github.com/JeanneBM/azure-kubernetes-agentic-ops-eval) explored controlled image correction with a shared deterministic policy gate. Its recorded campaign did not demonstrate an LLM advantage for that narrow task.
+## Repository contents
 
-This project investigates diagnosis rather than known image correction. It may reuse evidence-handling patterns, but has separate fixtures, ground truth and evaluation results. Automated remediation is outside the initial scope.
+| Path | Purpose |
+| --- | --- |
+| src/readiness_agent | Contracts, rules, model adapter, collector, replay and CLI |
+| data/dev/evidence | Synthetic input bundles |
+| data/dev/labels | Separate scoring labels |
+| tools/generate_dev_fixtures.py | Reproduce development fixtures in a new directory |
+| tests | Offline contract, replay, collector and provider-adapter tests |
+| demo | Disposable application, Dockerfile and Pod manifest |
+| docs/usage.md | Commands and operating limits |
+| docs/evaluation.md | Scoring, freezing and experiment boundaries |
+| docs/phase-2.md | Broader experiment design and staged expansion |
+| docs/status.md | Implemented, verified and pending work |
+| .github/workflows/ci.yml | Offline checks on Python 3.11–3.13 |
+
+## Boundaries
+
+No Azure resources are provisioned or cluster permissions changed. Secret objects are never read. Logs may still contain sensitive data: inspect bundles before provider submission or publication. Redaction is best effort, not a confidentiality guarantee.
+
+The provider adapter has no automatic retries. Model calls may incur charges; CI and default commands never make them.
+
+Keep rules if they suffice. Use the model for explanations if that is its only demonstrated benefit. Automated remediation requires a separate safety and outcome evaluation.

@@ -1,0 +1,10 @@
+{
+  "cause": "probe_path_mismatch",
+  "required_evidence_ids": [
+    "probe",
+    "events",
+    "logs"
+  ],
+  "split": "dev",
+  "origin": "synthetic-development"
+}

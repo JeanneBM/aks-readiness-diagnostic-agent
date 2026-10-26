@@ -1,0 +1,9 @@
+{
+  "cause": "dependency_unavailable",
+  "required_evidence_ids": [
+    "events",
+    "logs"
+  ],
+  "split": "dev",
+  "origin": "synthetic-development"
+}

@@ -1,0 +1,8 @@
+{
+  "cause": "healthy",
+  "required_evidence_ids": [
+    "status"
+  ],
+  "split": "dev",
+  "origin": "synthetic-development"
+}
