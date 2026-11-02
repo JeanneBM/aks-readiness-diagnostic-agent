@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "run_url": "https://github.com/JeanneBM/aks-readiness-diagnostic-agent/actions/runs/41471820620",
+  "source_commit": "0e56f46942d29e45023067c3dc78c82ed081d09b",
+  "source_artifact": "readiness-kind-a1-41471820620-1.zip",
+  "source_zip_sha256": "54e3ac30648f357b563986988546338f2e6bd27a3ddf185a494f549f74799aae",
+  "split": "dev",
+  "transformations": [
+    "Replace observed private IPv4 addresses consistently with documentation-only addresses.",
+    "Preserve timestamps, ports, routes, evidence IDs, labels and original result files."
+  ],
+  "original_dataset_sha256": {
+    "evidence/R001.json": "5e95d8788d9b5da6db531a3efe62f7a115e6561544132e05131abef7418e0ad3",
+    "evidence/R002.json": "63a6371d541a5d787243e3e7baf36f27608379c7922c5f6aa7c67668bc2c5c0c",
+    "evidence/R003.json": "d31f442c366346074dd793098020529898a4d07f60d8d4df654e321953ff77f7",
+    "evidence/R004.json": "399998c1edb611a3969c4e558c085957c0d15374a94bfc7139e0dcf2e9697b05",
+    "evidence/R005.json": "26dd5d669b00244a52053e0ee787d2e1eab7e7d2439a08be1da6cf57999baedd",
+    "evidence/R006.json": "35dc5fe91a4de65280db088f8c6e6acfb8e9c45895b557eb58c4d282bc97fde7",
+    "evidence/R007.json": "37dbb3ecacd96568a1940cb9cfab9b72314673c5556cd96edbea7f29bc905af2",
+    "evidence/R008.json": "a8f22aae5f71aee580fbabd3acc762388f6adbcf1fb2b057833783197791590c",
+    "labels/R001.json": "ab3986c1b35ea0bd28cf2db2e583596a61203091ba734fd92915af823f64de49",
+    "labels/R002.json": "75a7d20ba340eaf97fb83f1c2489a4cd599c22da3e54ca78808052c2ce08cadb",
+    "labels/R003.json": "f523dc32c6234c6b49dbaec0a94fdf1d6fe20d83660238535fd2a2579746755b",
+    "labels/R004.json": "e406f8e338b9ef4594d4b459a05d9ee26f51487a5c90687b901c4010efbd6f30",
+    "labels/R005.json": "1b16cbf3efdca53887b701518943ef9cfbfb761f6c0775688bca643c2ec80cfe",
+    "labels/R006.json": "c8b71283aaf90114af0e0b5c082956423e2880ab50dc15453ff2ca8fa53013a8",
+    "labels/R007.json": "8b8e732800f437268ea7be28cccdd042787a21f5b2d724df88554b1079e02148",
+    "labels/R008.json": "3adf3e3e0c7a3312410bdfbaf3b955c8515f979a2333c7d946cf747de12d4956",
+    "recording.json": "50d3f1ba2d1cf78e42b4adf95782a034baea5c17ab3fea7264f813c85faa4eca"
+  },
+  "published_dataset_sha256": {
+    "evidence/R001.json": "b5317d6a510631c4528ad198776b56facb3d62d2e01d1c92e81a81f0435d5904",
+    "evidence/R002.json": "c9e04197084f6e1e7f763dbb2098046f28d7eade60b94a98b5358ac4c5f20c1f",
+    "evidence/R003.json": "10d80c933712e835e7bfefc351ab64198c18ef5e6ba75acb4c6876c81f218c20",
+    "evidence/R004.json": "fe6cf0a670c261769c9132c36e1bedcd6d24e575e32d2e2bb5dfbe819270df87",
+    "evidence/R005.json": "26dd5d669b00244a52053e0ee787d2e1eab7e7d2439a08be1da6cf57999baedd",
+    "evidence/R006.json": "63c794be0fe93070e5d066af49b9be3576fe3b92376d843bdaa17156778a5df1",
+    "evidence/R007.json": "37dbb3ecacd96568a1940cb9cfab9b72314673c5556cd96edbea7f29bc905af2",
+    "evidence/R008.json": "1f60bac037e39420af64010cd0afd82600d17878875c9a36f5fe262da6cab9e1",
+    "labels/R001.json": "ab3986c1b35ea0bd28cf2db2e583596a61203091ba734fd92915af823f64de49",
+    "labels/R002.json": "75a7d20ba340eaf97fb83f1c2489a4cd599c22da3e54ca78808052c2ce08cadb",
+    "labels/R003.json": "f523dc32c6234c6b49dbaec0a94fdf1d6fe20d83660238535fd2a2579746755b",
+    "labels/R004.json": "e406f8e338b9ef4594d4b459a05d9ee26f51487a5c90687b901c4010efbd6f30",
+    "labels/R005.json": "1b16cbf3efdca53887b701518943ef9cfbfb761f6c0775688bca643c2ec80cfe",
+    "labels/R006.json": "c8b71283aaf90114af0e0b5c082956423e2880ab50dc15453ff2ca8fa53013a8",
+    "labels/R007.json": "8b8e732800f437268ea7be28cccdd042787a21f5b2d724df88554b1079e02148",
+    "labels/R008.json": "3adf3e3e0c7a3312410bdfbaf3b955c8515f979a2333c7d946cf747de12d4956",
+    "recording.json": "50d3f1ba2d1cf78e42b4adf95782a034baea5c17ab3fea7264f813c85faa4eca"
+  },
+  "original_results_note": "original-a1/manifest.json intentionally identifies pre-anonymization data. It is historical and must not be used as a freeze for the published dataset. sanitized-a1 contains a fresh replay with new data hashes."
+}

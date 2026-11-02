@@ -1,0 +1,72 @@
+{
+  "status": "RECORDED",
+  "origin": "local-kind",
+  "started_utc": "2026-11-02T15:28:28.172523+00:00",
+  "frameworks": [
+    "uvicorn",
+    "go"
+  ],
+  "cases": [
+    {
+      "id": "R001",
+      "framework": "uvicorn",
+      "scenario": "healthy",
+      "recorded_utc": "2026-11-02T15:29:48.548912+00:00"
+    },
+    {
+      "id": "R002",
+      "framework": "uvicorn",
+      "scenario": "port",
+      "recorded_utc": "2026-11-02T15:29:53.572069+00:00"
+    },
+    {
+      "id": "R003",
+      "framework": "uvicorn",
+      "scenario": "path",
+      "recorded_utc": "2026-11-02T15:29:58.584776+00:00"
+    },
+    {
+      "id": "R004",
+      "framework": "uvicorn",
+      "scenario": "dependency",
+      "recorded_utc": "2026-11-02T15:30:03.784607+00:00"
+    },
+    {
+      "id": "R005",
+      "framework": "go",
+      "scenario": "healthy",
+      "recorded_utc": "2026-11-02T15:30:10.566892+00:00"
+    },
+    {
+      "id": "R006",
+      "framework": "go",
+      "scenario": "port",
+      "recorded_utc": "2026-11-02T15:30:15.636799+00:00"
+    },
+    {
+      "id": "R007",
+      "framework": "go",
+      "scenario": "path",
+      "recorded_utc": "2026-11-02T15:30:20.767209+00:00"
+    },
+    {
+      "id": "R008",
+      "framework": "go",
+      "scenario": "dependency",
+      "recorded_utc": "2026-11-02T15:30:25.753706+00:00"
+    }
+  ],
+  "cluster_created": true,
+  "image_ids": {
+    "uvicorn": "sha256:b0217807f4575154c076c2553b70e6bcbb7bf9ef09933d61cb4360107a2ff21f",
+    "go": "sha256:4fdd5928b16ccc88e70169e6f336416a86458cbca63deff947be603255231ce5"
+  },
+  "fixture_source_sha256": {
+    "lab/go/Dockerfile": "2b32c4a5d19092a74f519f2583e26b7d1f4462e4b4b7022875ec901ed2647d9c",
+    "lab/go/go.mod": "86b095b1ebc9c593fde535a0573c703459abca437200a1ea53fcefb2a9c33f9f",
+    "lab/go/main.go": "60734e75230d8460bbb381d372a040acab53d1dde43d3bb724f1e2ae7f5493b1",
+    "lab/uvicorn/Dockerfile": "bfc38e8ad4566ef13ce446905a6228477cf3775e3c3e1dd4b06d4ebce6b9169f",
+    "lab/uvicorn/app.py": "766dc72321d078ff34f045db3fd1aea4abcfd435563d37703b834d640ed900cf",
+    "lab/uvicorn/requirements.txt": "3ef060a80ec02839f6e8303ec019c30ddfbe7e75c0f2368e087d68694792ac87"
+  }
+}

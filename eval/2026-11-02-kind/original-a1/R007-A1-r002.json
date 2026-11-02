@@ -1,0 +1,28 @@
+{
+  "case_id": "R007",
+  "variant": "A1",
+  "repetition": 2,
+  "split": "dev",
+  "framework": "go",
+  "ground_truth": "probe_path_mismatch",
+  "status": "OK",
+  "usage": {},
+  "model_calls": 0,
+  "rubric_evidence_covered": true,
+  "diagnostic_risk": false,
+  "unsupported_conclusion": false,
+  "diagnosis": {
+    "cause": "probe_path_mismatch",
+    "summary": "Probe path differs from the logged readiness endpoint.",
+    "evidence_ids": [
+      "probe",
+      "events",
+      "logs"
+    ],
+    "recommendation": "Verify the readiness route and configure the probe path accordingly.",
+    "uncertainty": "Snapshot-level inference; logs may be stale or misleading. Verify before changing configuration."
+  },
+  "cause_correct": true,
+  "appropriate_abstention": null,
+  "seconds": 3.45019999770102e-05
+}

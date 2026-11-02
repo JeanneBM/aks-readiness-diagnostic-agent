@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "target": "selected-pod/selected-container",
+  "observations": [
+    {
+      "id": "status",
+      "kind": "pod_status",
+      "source": "pod/status",
+      "text": "Ready=False"
+    },
+    {
+      "id": "probe",
+      "kind": "probe_config",
+      "source": "pod/spec/readinessProbe",
+      "text": "{\"path\": \"/ready\", \"port\": 8080, \"scheme\": \"HTTP\"}"
+    },
+    {
+      "id": "events",
+      "kind": "probe_result",
+      "source": "pod/events/time-ordered",
+      "text": "Readiness probe failed: HTTP probe failed with statuscode: 503"
+    },
+    {
+      "id": "logs",
+      "kind": "app_log",
+      "source": "container/logs/recent-10m",
+      "text": "2026-11-02T15:30:02.637489759Z INFO:     Started server process [1]\n2026-11-02T15:30:02.637545433Z INFO:     Waiting for application startup.\n2026-11-02T15:30:02.637910855Z INFO:     Readiness route registered: GET /ready\n2026-11-02T15:30:02.637914300Z INFO:     Application startup complete.\n2026-11-02T15:30:02.637916984Z INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)\n2026-11-02T15:30:02.811319007Z INFO:     192.0.2.1:49730 - \"GET /live HTTP/1.1\" 200 OK\n2026-11-02T15:30:03.209897694Z ERROR:    Readiness dependency inventory unavailable: <urlopen error [Errno 111] Connection refused>\n2026-11-02T15:30:03.210117746Z INFO:     192.0.2.1:49738 - \"GET /ready HTTP/1.1\" 503 Service Unavailable\n"
+    },
+    {
+      "id": "startup",
+      "kind": "app_log",
+      "source": "container/logs/available-prefix",
+      "text": "2026-11-02T15:30:02.637489759Z INFO:     Started server process [1]\n2026-11-02T15:30:02.637545433Z INFO:     Waiting for application startup.\n2026-11-02T15:30:02.637910855Z INFO:     Readiness route registered: GET /ready\n2026-11-02T15:30:02.637914300Z INFO:     Application startup complete.\n2026-11-02T15:30:02.637916984Z INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)\n2026-11-02T15:30:02.811319007Z INFO:     192.0.2.1:49730 - \"GET /live HTTP/1.1\" 200 OK\n2026-11-02T15:30:03.209897694Z ERROR:    Readiness dependency inventory unavailable: <urlopen error [Errno 111] Connection refused>\n2026-11-02T15:30:03.210117746Z INFO:     192.0.2.1:49738 - \"GET /ready HTTP/1.1\" 503 Service Unavailable\n"
+    },
+    {
+      "id": "snapshot-limit",
+      "kind": "limitation",
+      "source": "collector",
+      "text": "Sequential reads are not atomic. Logs may be stale or rotated; the prefix is the beginning of available current-container logs, not guaranteed original startup."
+    }
+  ]
+}

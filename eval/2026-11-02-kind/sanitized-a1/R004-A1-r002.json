@@ -1,0 +1,27 @@
+{
+  "case_id": "R004",
+  "variant": "A1",
+  "repetition": 2,
+  "split": "dev",
+  "framework": "uvicorn",
+  "ground_truth": "dependency_unavailable",
+  "status": "OK",
+  "usage": {},
+  "model_calls": 0,
+  "rubric_evidence_covered": true,
+  "diagnostic_risk": false,
+  "unsupported_conclusion": false,
+  "diagnosis": {
+    "cause": "dependency_unavailable",
+    "summary": "Application readiness reports a failed dependency check.",
+    "evidence_ids": [
+      "events",
+      "logs"
+    ],
+    "recommendation": "Inspect the reported dependency; do not assume a network or credential cause.",
+    "uncertainty": "Snapshot-level inference; logs may be stale or misleading. Verify before changing configuration."
+  },
+  "cause_correct": true,
+  "appropriate_abstention": null,
+  "seconds": 5.932999920332804e-05
+}

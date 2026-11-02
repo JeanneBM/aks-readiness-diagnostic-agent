@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "target": "selected-pod/selected-container",
+  "observations": [
+    {
+      "id": "status",
+      "kind": "pod_status",
+      "source": "pod/status",
+      "text": "Ready=False"
+    },
+    {
+      "id": "probe",
+      "kind": "probe_config",
+      "source": "pod/spec/readinessProbe",
+      "text": "{\"path\": \"/ready\", \"port\": 9090, \"scheme\": \"HTTP\"}"
+    },
+    {
+      "id": "events",
+      "kind": "probe_result",
+      "source": "pod/events/time-ordered",
+      "text": "Readiness probe failed: Get \"http://192.0.2.7:9090/ready\": dial tcp 192.0.2.7:9090: connect: connection refused"
+    },
+    {
+      "id": "logs",
+      "kind": "app_log",
+      "source": "container/logs/recent-10m",
+      "text": "2026-11-02T15:29:52.456940765Z INFO:     Started server process [1]\n2026-11-02T15:29:52.456982888Z INFO:     Waiting for application startup.\n2026-11-02T15:29:52.457091863Z INFO:     Readiness route registered: GET /ready\n2026-11-02T15:29:52.457136170Z INFO:     Application startup complete.\n2026-11-02T15:29:52.457358615Z INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)\n2026-11-02T15:29:52.622117667Z INFO:     192.0.2.1:49062 - \"GET /live HTTP/1.1\" 200 OK\n"
+    },
+    {
+      "id": "startup",
+      "kind": "app_log",
+      "source": "container/logs/available-prefix",
+      "text": "2026-11-02T15:29:52.456940765Z INFO:     Started server process [1]\n2026-11-02T15:29:52.456982888Z INFO:     Waiting for application startup.\n2026-11-02T15:29:52.457091863Z INFO:     Readiness route registered: GET /ready\n2026-11-02T15:29:52.457136170Z INFO:     Application startup complete.\n2026-11-02T15:29:52.457358615Z INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)\n2026-11-02T15:29:52.622117667Z INFO:     192.0.2.1:49062 - \"GET /live HTTP/1.1\" 200 OK\n"
+    },
+    {
+      "id": "snapshot-limit",
+      "kind": "limitation",
+      "source": "collector",
+      "text": "Sequential reads are not atomic. Logs may be stale or rotated; the prefix is the beginning of available current-container logs, not guaranteed original startup."
+    }
+  ]
+}

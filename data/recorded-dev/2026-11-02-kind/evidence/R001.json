@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "target": "selected-pod/selected-container",
+  "observations": [
+    {
+      "id": "status",
+      "kind": "pod_status",
+      "source": "pod/status",
+      "text": "Ready=True"
+    },
+    {
+      "id": "probe",
+      "kind": "probe_config",
+      "source": "pod/spec/readinessProbe",
+      "text": "{\"path\": \"/ready\", \"port\": 8080, \"scheme\": \"HTTP\"}"
+    },
+    {
+      "id": "events-empty",
+      "kind": "limitation",
+      "source": "collector",
+      "text": "No readiness failure Events were available; absence is not proof of health."
+    },
+    {
+      "id": "logs",
+      "kind": "app_log",
+      "source": "container/logs/recent-10m",
+      "text": "2026-11-02T15:29:47.253913675Z INFO:     Started server process [1]\n2026-11-02T15:29:47.253959214Z INFO:     Waiting for application startup.\n2026-11-02T15:29:47.254070122Z INFO:     Readiness route registered: GET /ready\n2026-11-02T15:29:47.254115660Z INFO:     Application startup complete.\n2026-11-02T15:29:47.254368041Z INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)\n2026-11-02T15:29:47.441161352Z INFO:     192.0.2.1:45326 - \"GET /live HTTP/1.1\" 200 OK\n2026-11-02T15:29:48.179083220Z INFO:     192.0.2.1:45330 - \"GET /ready HTTP/1.1\" 200 OK\n"
+    },
+    {
+      "id": "startup",
+      "kind": "app_log",
+      "source": "container/logs/available-prefix",
+      "text": "2026-11-02T15:29:47.253913675Z INFO:     Started server process [1]\n2026-11-02T15:29:47.253959214Z INFO:     Waiting for application startup.\n2026-11-02T15:29:47.254070122Z INFO:     Readiness route registered: GET /ready\n2026-11-02T15:29:47.254115660Z INFO:     Application startup complete.\n2026-11-02T15:29:47.254368041Z INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)\n2026-11-02T15:29:47.441161352Z INFO:     192.0.2.1:45326 - \"GET /live HTTP/1.1\" 200 OK\n2026-11-02T15:29:48.179083220Z INFO:     192.0.2.1:45330 - \"GET /ready HTTP/1.1\" 200 OK\n"
+    },
+    {
+      "id": "snapshot-limit",
+      "kind": "limitation",
+      "source": "collector",
+      "text": "Sequential reads are not atomic. Logs may be stale or rotated; the prefix is the beginning of available current-container logs, not guaranteed original startup."
+    }
+  ]
+}

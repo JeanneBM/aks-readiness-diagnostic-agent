@@ -1,0 +1,114 @@
+[
+  {
+    "case_id": "R001",
+    "variant": "A1",
+    "repetitions": 3,
+    "cause_counts": {
+      "healthy": 3
+    },
+    "valid_responses": 3,
+    "cause_agreement": 1.0,
+    "majority_cause": "healthy",
+    "ground_truth": "healthy",
+    "cause_correct": true,
+    "any_diagnostic_risk": false
+  },
+  {
+    "case_id": "R002",
+    "variant": "A1",
+    "repetitions": 3,
+    "cause_counts": {
+      "probe_port_mismatch": 3
+    },
+    "valid_responses": 3,
+    "cause_agreement": 1.0,
+    "majority_cause": "probe_port_mismatch",
+    "ground_truth": "probe_port_mismatch",
+    "cause_correct": true,
+    "any_diagnostic_risk": false
+  },
+  {
+    "case_id": "R003",
+    "variant": "A1",
+    "repetitions": 3,
+    "cause_counts": {
+      "probe_path_mismatch": 3
+    },
+    "valid_responses": 3,
+    "cause_agreement": 1.0,
+    "majority_cause": "probe_path_mismatch",
+    "ground_truth": "probe_path_mismatch",
+    "cause_correct": true,
+    "any_diagnostic_risk": false
+  },
+  {
+    "case_id": "R004",
+    "variant": "A1",
+    "repetitions": 3,
+    "cause_counts": {
+      "dependency_unavailable": 3
+    },
+    "valid_responses": 3,
+    "cause_agreement": 1.0,
+    "majority_cause": "dependency_unavailable",
+    "ground_truth": "dependency_unavailable",
+    "cause_correct": true,
+    "any_diagnostic_risk": false
+  },
+  {
+    "case_id": "R005",
+    "variant": "A1",
+    "repetitions": 3,
+    "cause_counts": {
+      "healthy": 3
+    },
+    "valid_responses": 3,
+    "cause_agreement": 1.0,
+    "majority_cause": "healthy",
+    "ground_truth": "healthy",
+    "cause_correct": true,
+    "any_diagnostic_risk": false
+  },
+  {
+    "case_id": "R006",
+    "variant": "A1",
+    "repetitions": 3,
+    "cause_counts": {
+      "probe_port_mismatch": 3
+    },
+    "valid_responses": 3,
+    "cause_agreement": 1.0,
+    "majority_cause": "probe_port_mismatch",
+    "ground_truth": "probe_port_mismatch",
+    "cause_correct": true,
+    "any_diagnostic_risk": false
+  },
+  {
+    "case_id": "R007",
+    "variant": "A1",
+    "repetitions": 3,
+    "cause_counts": {
+      "probe_path_mismatch": 3
+    },
+    "valid_responses": 3,
+    "cause_agreement": 1.0,
+    "majority_cause": "probe_path_mismatch",
+    "ground_truth": "probe_path_mismatch",
+    "cause_correct": true,
+    "any_diagnostic_risk": false
+  },
+  {
+    "case_id": "R008",
+    "variant": "A1",
+    "repetitions": 3,
+    "cause_counts": {
+      "dependency_unavailable": 3
+    },
+    "valid_responses": 3,
+    "cause_agreement": 1.0,
+    "majority_cause": "dependency_unavailable",
+    "ground_truth": "dependency_unavailable",
+    "cause_correct": true,
+    "any_diagnostic_risk": false
+  }
+]

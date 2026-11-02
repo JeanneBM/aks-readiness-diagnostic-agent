@@ -1,0 +1,39 @@
+{
+  "schema": 2,
+  "python": "3.12.15",
+  "code": {
+    "__init__.py": "4a28ebd939c86bb084f42b353181cca892c13ef2d1cd3420eaa563103164417b",
+    "baseline.py": "dab418ef11c47118c8c2a8fb3958e919e0d7961ed0d51af65cbbf4786615ee68",
+    "cli.py": "92aa251470f2609ffc76fed03fa497ddd99d6fea404ca35136b84365216b32b2",
+    "collector.py": "e844261cb9007e5ae8a1cd26828a6f7d4566ba4fb4cd21c5a280f0716ffffadc",
+    "errors.py": "a21f44af7b6e515222960e9f0be072f4c593037c7713660320bb93c2923a40d9",
+    "evaluation.py": "a0338d6e97418edf149ecc496bba5a42f6c7e154aa892e922d32c81d3fe0f651",
+    "llm.py": "16bfa161b49e7a05fc66cfd5335255e5c87d3d5c5a5289c094096f7dac548d39",
+    "models.py": "b685435228b24c46fab3159737c1ef54434a8abde9c48243da9585cc4d8d5bd7"
+  },
+  "data": {
+    "evidence/R001.json": "5e95d8788d9b5da6db531a3efe62f7a115e6561544132e05131abef7418e0ad3",
+    "evidence/R002.json": "63a6371d541a5d787243e3e7baf36f27608379c7922c5f6aa7c67668bc2c5c0c",
+    "evidence/R003.json": "d31f442c366346074dd793098020529898a4d07f60d8d4df654e321953ff77f7",
+    "evidence/R004.json": "399998c1edb611a3969c4e558c085957c0d15374a94bfc7139e0dcf2e9697b05",
+    "evidence/R005.json": "26dd5d669b00244a52053e0ee787d2e1eab7e7d2439a08be1da6cf57999baedd",
+    "evidence/R006.json": "35dc5fe91a4de65280db088f8c6e6acfb8e9c45895b557eb58c4d282bc97fde7",
+    "evidence/R007.json": "37dbb3ecacd96568a1940cb9cfab9b72314673c5556cd96edbea7f29bc905af2",
+    "evidence/R008.json": "a8f22aae5f71aee580fbabd3acc762388f6adbcf1fb2b057833783197791590c",
+    "labels/R001.json": "ab3986c1b35ea0bd28cf2db2e583596a61203091ba734fd92915af823f64de49",
+    "labels/R002.json": "75a7d20ba340eaf97fb83f1c2489a4cd599c22da3e54ca78808052c2ce08cadb",
+    "labels/R003.json": "f523dc32c6234c6b49dbaec0a94fdf1d6fe20d83660238535fd2a2579746755b",
+    "labels/R004.json": "e406f8e338b9ef4594d4b459a05d9ee26f51487a5c90687b901c4010efbd6f30",
+    "labels/R005.json": "1b16cbf3efdca53887b701518943ef9cfbfb761f6c0775688bca643c2ec80cfe",
+    "labels/R006.json": "c8b71283aaf90114af0e0b5c082956423e2880ab50dc15453ff2ca8fa53013a8",
+    "labels/R007.json": "8b8e732800f437268ea7be28cccdd042787a21f5b2d724df88554b1079e02148",
+    "labels/R008.json": "3adf3e3e0c7a3312410bdfbaf3b955c8515f979a2333c7d946cf747de12d4956",
+    "recording.json": "50d3f1ba2d1cf78e42b4adf95782a034baea5c17ab3fea7264f813c85faa4eca"
+  },
+  "data_splits": [
+    "dev"
+  ],
+  "prompt_sha256": "642cb373ca26a9fdd08287fd6a599f16b188fd49151cab094fde3d7bc3a624b1",
+  "output_schema_sha256": "b2261bca328d04086e7e494a0ed58271bbff90217aff01e71c93b3b8949871e9",
+  "model_config": null
+}

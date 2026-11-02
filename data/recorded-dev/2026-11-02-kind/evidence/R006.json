@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "target": "selected-pod/selected-container",
+  "observations": [
+    {
+      "id": "status",
+      "kind": "pod_status",
+      "source": "pod/status",
+      "text": "Ready=False"
+    },
+    {
+      "id": "probe",
+      "kind": "probe_config",
+      "source": "pod/spec/readinessProbe",
+      "text": "{\"path\": \"/ready\", \"port\": 9090, \"scheme\": \"HTTP\"}"
+    },
+    {
+      "id": "events",
+      "kind": "probe_result",
+      "source": "pod/events/time-ordered",
+      "text": "Readiness probe failed: Get \"http://192.0.2.12:9090/ready\": dial tcp 192.0.2.12:9090: connect: connection refused"
+    },
+    {
+      "id": "logs",
+      "kind": "app_log",
+      "source": "container/logs/recent-10m",
+      "text": "2026-11-02T15:30:13.941267911Z time=2026-11-02T15:30:13.941Z level=INFO msg=\"starting HTTP server\" address=:8080 readiness_path=/ready role=api\n"
+    },
+    {
+      "id": "startup",
+      "kind": "app_log",
+      "source": "container/logs/available-prefix",
+      "text": "2026-11-02T15:30:13.941267911Z time=2026-11-02T15:30:13.941Z level=INFO msg=\"starting HTTP server\" address=:8080 readiness_path=/ready role=api\n"
+    },
+    {
+      "id": "snapshot-limit",
+      "kind": "limitation",
+      "source": "collector",
+      "text": "Sequential reads are not atomic. Logs may be stale or rotated; the prefix is the beginning of available current-container logs, not guaranteed original startup."
+    }
+  ]
+}

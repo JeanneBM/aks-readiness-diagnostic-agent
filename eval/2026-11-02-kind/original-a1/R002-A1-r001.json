@@ -1,0 +1,28 @@
+{
+  "case_id": "R002",
+  "variant": "A1",
+  "repetition": 1,
+  "split": "dev",
+  "framework": "uvicorn",
+  "ground_truth": "probe_port_mismatch",
+  "status": "OK",
+  "usage": {},
+  "model_calls": 0,
+  "rubric_evidence_covered": true,
+  "diagnostic_risk": false,
+  "unsupported_conclusion": false,
+  "diagnosis": {
+    "cause": "probe_port_mismatch",
+    "summary": "Probe port differs from the logged listener.",
+    "evidence_ids": [
+      "probe",
+      "events",
+      "logs"
+    ],
+    "recommendation": "Verify the listener and configure the readiness probe port accordingly.",
+    "uncertainty": "Snapshot-level inference; logs may be stale or misleading. Verify before changing configuration."
+  },
+  "cause_correct": true,
+  "appropriate_abstention": null,
+  "seconds": 0.00048420100000612365
+}

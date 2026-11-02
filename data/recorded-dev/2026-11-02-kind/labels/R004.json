@@ -1,0 +1,18 @@
+{
+  "cause": "dependency_unavailable",
+  "required_evidence_ids": [
+    "events"
+  ],
+  "split": "dev",
+  "origin": "local-kind-recorded",
+  "framework": "uvicorn",
+  "scenario": "dependency",
+  "evidence_options": [
+    [
+      "logs"
+    ],
+    [
+      "startup"
+    ]
+  ]
+}

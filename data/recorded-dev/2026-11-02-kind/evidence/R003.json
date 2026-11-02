@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "target": "selected-pod/selected-container",
+  "observations": [
+    {
+      "id": "status",
+      "kind": "pod_status",
+      "source": "pod/status",
+      "text": "Ready=False"
+    },
+    {
+      "id": "probe",
+      "kind": "probe_config",
+      "source": "pod/spec/readinessProbe",
+      "text": "{\"path\": \"/wrong-readiness-path\", \"port\": 8080, \"scheme\": \"HTTP\"}"
+    },
+    {
+      "id": "events",
+      "kind": "probe_result",
+      "source": "pod/events/time-ordered",
+      "text": "Readiness probe failed: HTTP probe failed with statuscode: 404"
+    },
+    {
+      "id": "logs",
+      "kind": "app_log",
+      "source": "container/logs/recent-10m",
+      "text": "2026-11-02T15:29:57.464230384Z INFO:     Started server process [1]\n2026-11-02T15:29:57.464272207Z INFO:     Waiting for application startup.\n2026-11-02T15:29:57.464348612Z INFO:     Readiness route registered: GET /ready\n2026-11-02T15:29:57.464396675Z INFO:     Application startup complete.\n2026-11-02T15:29:57.464624399Z INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)\n2026-11-02T15:29:57.637316099Z INFO:     192.0.2.1:48820 - \"GET /live HTTP/1.1\" 200 OK\n2026-11-02T15:29:58.187003535Z INFO:     192.0.2.1:48836 - \"GET /wrong-readiness-path HTTP/1.1\" 404 Not Found\n"
+    },
+    {
+      "id": "startup",
+      "kind": "app_log",
+      "source": "container/logs/available-prefix",
+      "text": "2026-11-02T15:29:57.464230384Z INFO:     Started server process [1]\n2026-11-02T15:29:57.464272207Z INFO:     Waiting for application startup.\n2026-11-02T15:29:57.464348612Z INFO:     Readiness route registered: GET /ready\n2026-11-02T15:29:57.464396675Z INFO:     Application startup complete.\n2026-11-02T15:29:57.464624399Z INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)\n2026-11-02T15:29:57.637316099Z INFO:     192.0.2.1:48820 - \"GET /live HTTP/1.1\" 200 OK\n2026-11-02T15:29:58.187003535Z INFO:     192.0.2.1:48836 - \"GET /wrong-readiness-path HTTP/1.1\" 404 Not Found\n"
+    },
+    {
+      "id": "snapshot-limit",
+      "kind": "limitation",
+      "source": "collector",
+      "text": "Sequential reads are not atomic. Logs may be stale or rotated; the prefix is the beginning of available current-container logs, not guaranteed original startup."
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "cause": "healthy",
+  "required_evidence_ids": [
+    "status"
+  ],
+  "split": "dev",
+  "origin": "local-kind-recorded",
+  "framework": "go",
+  "scenario": "healthy"
+}
