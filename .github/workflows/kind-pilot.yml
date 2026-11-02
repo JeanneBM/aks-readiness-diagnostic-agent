@@ -1,0 +1,104 @@
+name: Readiness kind pilot
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: readiness-kind-pilot-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  recorded-a1:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      KIND_EXPERIMENTAL_PROVIDER: docker
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false
+      - name: Install kind and Python package
+        run: |
+          go install sigs.k8s.io/kind@v0.33.0
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+          python -m pip install -e .
+      - name: Check runner prerequisites
+        run: |
+          mkdir -p .local/diagnostics
+          python tools/run_local_lab.py check
+          git rev-parse HEAD > .local/diagnostics/source-commit.txt
+          docker version > .local/diagnostics/docker-version.txt
+          kind version > .local/diagnostics/kind-version.txt
+          kubectl version --client -o json > .local/diagnostics/kubectl-version.json
+      - name: Offline regression checks
+        run: python -m unittest discover -s tests -v
+      - name: Record eight real development cases
+        run: |
+          set -o pipefail
+          python tools/run_local_lab.py record --create-cluster --output .local/recordings/dev-001 --allow-local-lab 2>&1 | tee .local/diagnostics/record.log
+      - name: Replay A1 three times per case
+        run: |
+          set -o pipefail
+          python tools/run_local_lab.py pilot --cases .local/recordings/dev-001 --output .local/runs/recorded-a1-001 --variants A1 --repetitions 3 2>&1 | tee .local/diagnostics/pilot.log
+      - name: Verify complete recording and evaluation
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          recording = json.loads(Path(".local/recordings/dev-001/recording.json").read_text())
+          summary = json.loads(Path(".local/runs/recorded-a1-001/summary.json").read_text())
+          assert recording["status"] == "RECORDED", recording
+          assert len(recording["cases"]) == 8, recording
+          assert {(c["framework"], c["scenario"]) for c in recording["cases"]} == {
+              (f, s) for f in ("uvicorn", "go") for s in ("healthy", "port", "path", "dependency")
+          }
+          a1 = summary["variants"]["A1"]
+          assert a1["cases"] == 8 and a1["attempts"] == 24, a1
+          assert a1["model_calls"] == 0, a1
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as report:
+              report.write("# Recorded development pilot: A1\n\n")
+              report.write("8 real kind cases; 3 repetitions per case. Development data, not held-out validation.\n\n")
+              report.write(f"Correct attempts: {a1['correct_attempts']}/24; errors: {a1['errors']}; model calls: {a1['model_calls']}.\n")
+          assert a1["errors"] == 0 and a1["correct_attempts"] == 24, a1
+          assert a1["unsupported_conclusions"] == 0, a1
+          PY
+      - name: Preserve cluster diagnostics
+        if: always()
+        timeout-minutes: 3
+        run: |
+          mkdir -p .local/diagnostics
+          if command -v kind >/dev/null && kind get clusters | grep -qx readiness-diag; then
+            kind export logs .local/diagnostics/kind --name readiness-diag
+          fi
+      - name: Upload recordings, results and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: readiness-kind-a1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            .local/recordings/
+            .local/runs/
+            .local/diagnostics/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Delete dedicated runner cluster
+        if: always()
+        timeout-minutes: 3
+        run: |
+          if command -v kind >/dev/null && kind get clusters | grep -qx readiness-diag; then
+            kind delete cluster --name readiness-diag
+          fi
