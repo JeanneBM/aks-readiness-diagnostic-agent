@@ -57,6 +57,8 @@ def container(image, env=None, probe_port=8080, probe_path="/ready"):
     return {"name": "api", "image": image, "imagePullPolicy": "IfNotPresent",
             "env": [{"name": k, "value": v} for k, v in (env or {}).items()],
             "ports": [{"containerPort": 8080}],
+            "startupProbe": {"httpGet": {"port": 8080, "path": "/live"},
+                             "periodSeconds": 1, "timeoutSeconds": 3, "failureThreshold": 60},
             "readinessProbe": {"httpGet": {"port": probe_port, "path": probe_path},
                                "periodSeconds": 2, "timeoutSeconds": 3, "failureThreshold": 1},
             "resources": {"requests": {"cpu": "25m", "memory": "32Mi"},
@@ -120,6 +122,23 @@ def supporting_log_options(bundle, scenario):
             and any(needle in o.text for needle in needles)]
 
 
+def collect_recording_evidence(cluster, pod, scenario, seconds=30):
+    """Wait for application evidence after a probe can fail before process startup."""
+    required = ({"status"} if scenario == "healthy" else {"events", "logs"}
+                if scenario == "dependency" else {"probe", "events", "startup"})
+    deadline = time.monotonic() + seconds
+    while True:
+        bundle = collect("kind-" + cluster, NAMESPACE, pod, "api")
+        missing = required - {o.id for o in bundle.observations}
+        supported = scenario == "healthy" or bool(supporting_log_options(bundle, scenario))
+        if not missing and supported:
+            return bundle
+        if time.monotonic() >= deadline:
+            detail = ", ".join(sorted(missing)) or "cause-supporting application log"
+            raise ValueError(f"Recording evidence timeout for {pod}: missing {detail}")
+        time.sleep(1)
+
+
 def record(cluster, output, create_cluster):
     preflight()
     output = Path(output).resolve()
@@ -168,7 +187,7 @@ def record(cluster, output, create_cluster):
                     kubectl(cluster, ["-n", NAMESPACE, "wait", "--for=condition=Ready", "pod/" + name, "--timeout=90s"])
                 else:
                     wait_for_fault(cluster, name, scenario)
-                bundle = collect("kind-" + cluster, NAMESPACE, name, "api")
+                bundle = collect_recording_evidence(cluster, name, scenario)
                 ids = (["status"] if scenario == "healthy" else ["events", "logs"] if scenario == "dependency"
                        else ["probe", "events", "startup"])
                 if not set(ids) <= {o.id for o in bundle.observations}:
