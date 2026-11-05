@@ -12,4 +12,4 @@ The artifact contains recordings, separate labels, per-attempt results, consiste
 
 The validation step requires a complete eight-case recording, 24 correct A1 attempts, zero errors and no unsupported conclusions. A failed check leaves the actual results visible; it does not rewrite labels or expected results. These are development cases, not held-out validation or evidence of LLM superiority. C1/H are not run by this workflow.
 
-Status: workflow added and syntax checked; a complete successful runner execution remains to be verified. See local-lab.md for recorder details.
+Status: [run #2](https://github.com/JeanneBM/aks-readiness-diagnostic-agent/actions/runs/41471820620) completed successfully on 2 November 2026: eight recorded cases and 24/24 correct A1 attempts, with zero errors and no model calls. Anonymized recordings are preserved under data/recorded-dev/2026-11-02-kind, with provenance and results under eval/2026-11-02-kind. C1/H remain pending. See local-lab.md for recorder details.
