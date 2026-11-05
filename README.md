@@ -1,110 +1,67 @@
 # AKS Readiness Diagnostic Agent
 
-**Can an LLM explain readiness failures better than explicit rules using the same evidence?**
+**A read-only Kubernetes readiness diagnostic experiment, validated on kind. AKS validation is pending.**
 
-A runnable, read-only diagnostic experiment with an explicit baseline, optional model adapter, rules-to-model cascade, recorded-evidence replay, bounded Kubernetes collector and disposable demo application.
+I compare explicit rules (A1), one model request (C1), and a rules-to-model cascade (H) on exactly the same recorded evidence. The question is whether a model improves diagnosis or explanation enough to justify its latency, cost and failure modes. Recommendations are displayed as text and never executed.
 
-**Status:** development implementation with 18 synthetic fixtures and eight real kind recordings. A1 achieved 24/24 correct attempts (three repetitions per case), with zero errors and no model calls. The first recorded A1/C1/H pilot is complete: C1 achieved 9/24 correct attempts with ten provider failures; H used only rules. Held-out evaluation and live AKS validation remain pending.
+| Development pilot | Correct attempts | Provider failures | Model calls |
+| --- | ---: | ---: | ---: |
+| A1 — rules | 24/24 | 0 | 0 |
+| C1 — gpt-4.1-nano | 9/24 | 10 | 24 |
+| H — cascade | 24/24 | 0 | 0 |
 
-## Scope
+Eight instrumented Uvicorn/Go cases, three repetitions each. **These results do not establish that rules outperform LLMs generally.** A1 was developed against these lab patterns. H never reached the model. Ten C1 requests failed without preserved HTTP details; missing Go answers cannot be attributed to model quality. There is no independent held-out result.
 
-| Input | Output |
-| --- | --- |
-| Pod readiness state, HTTP probe configuration, readiness failure Events and application logs | Proposed cause, evidence IDs, recommendation and uncertainty |
-| Missing, ambiguous or conflicting evidence | Explicit insufficient-evidence outcome |
+[Original pilot and provenance](eval/2026-11-05-kind-paired) · [Post-hoc citation review](eval/2026-11-05-kind-paired/rubric-v2) · [Current status](docs/status.md)
 
-Initial causes: incorrect probe port, incorrect probe path and unavailable application dependency. Healthy and ambiguous controls are included. A dependency failure diagnosis does not establish whether DNS, networking, credentials or the service itself caused it.
+## Diagnostic flow
 
-There is no mutation executor. Recommendations are text, never executed commands.
-
-## Start offline
-
-Python 3.11 or newer. Run from the repository root:
-
-```bash
-python -m venv .venv
+```mermaid
+flowchart TD
+    E["Recorded evidence"] --> R["Rules: A1 or H"]
+    E --> C["Model: C1"]
+    R -->|"H abstains"| C
+    R -->|"A1 result or H decision"| V["Validate and score"]
+    C --> V
+    V --> O["Diagnosis, citations, fixed advice"]
 ```
 
-Activate on Windows Git Bash with `source .venv/Scripts/activate`, or on Linux/macOS with `source .venv/bin/activate`. Then:
+Evidence and ground-truth labels stay separate. Scoring distinguishes cause correctness and citation coverage; a valid evidence ID alone does not prove semantic support. Provider failures stay in the denominator. Repetitions measure consistency, while paired comparisons use eight cases, not 24 independent samples.
+
+## Replay without a cluster or model
+
+Python 3.11+. From the repository root:
 
 ```bash
 python -m pip install -e .
 python -m unittest discover -s tests -v
-python -m readiness_agent.cli diagnose data/dev/evidence/D001.json
-python -m readiness_agent.cli evaluate --cases data/dev --variants A1 --output .local/runs/dev-001
+python tools/run_local_lab.py pilot --cases data/recorded-dev/2026-11-02-kind --output .local/runs/a1-replay --variants A1 --repetitions 3
 ```
 
-Default commands make no Kubernetes or model requests. Existing result directories are never overwritten.
+Use a new output directory each time. This makes no model requests. Eighteen additional fixtures under `data/dev` are synthetic regression examples, not independent validation.
 
-## Variants
+## Citation review: preserve the original result
 
-| Variant | Implementation |
-| --- | --- |
-| A1 | Explicit rules over the recorded bundle; abstains outside known patterns |
-| C1 | One model request over the same bundle |
-| H | A1 first; C1 only when A1 abstains |
-
-A1 is the initial transparent baseline, not a claim of the strongest possible rules engine. Improve rules and prompts on development data with comparable effort before freezing them. Model requests require provider configuration and an explicit flag.
-
-## Evaluation rules
-
-- Keep ground truth in separate label files. Models receive evidence only.
-- Freeze rules, prompts and scoring before independent held-out preparation.
-- Preserve provider and contract failures as ERROR, not correct abstentions.
-- Measure cause accuracy, evidence-rubric coverage, abstention, unsupported conclusions, latency and reported tokens.
-- Existing evidence IDs do not prove semantic support. Human review remains necessary.
-
-The 18 committed fixtures are synthetic development examples, including ambiguous and injected-instruction cases. Passing them checks implementation consistency, not generalization or prompt-injection resistance.
-
-## Local framework pilot
-
-Uvicorn and Go applications, a separate HTTP dependency and a cross-platform recorder are provided under lab and tools. Start by checking local prerequisites:
+R003's access log contains both the registered readiness route and the failing 404 request. The original rubric unnecessarily also required the Event ID. A documented post-hoc rubric revision accepts `probe` plus `logs` or `startup` for this case. Rescoring the saved responses reduces the conservative C1 risk flags from six to three; cause accuracy and provider errors are unchanged. This is a development correction after observing outputs, not preregistered confirmation.
 
 ```bash
-python tools/run_local_lab.py check
+python tools/rescore_recorded_pilot.py --output .local/review/rubric-v2.json
 ```
 
-Then follow docs/local-lab.md to record three faults plus a healthy control per framework on a dedicated kind cluster. Both variants replay the same actual recordings; no Azure provisioning is needed. The full recording flow passed [GitHub Actions run #2](https://github.com/JeanneBM/aks-readiness-diagnostic-agent/actions/runs/41471820620) on 2 November 2026.
+The original evidence, labels and result files remain unchanged. New model recommendations use fixed, read-only templates, while dynamic strict schemas restrict citation IDs to the current bundle. Summary and uncertainty text remain untrusted model output.
 
-Evaluation supports 1–10 repetitions, per-case agreement and schema-2 development preregistration for new held-out data. Contract-invalid model output, including invented evidence IDs, counts as diagnostic risk; provider failures remain separate errors.
+## Next experiment
 
-## Preserved real recordings
+Record workloads with sparse/default logs and ambiguous controls; allow abstention when the evidence cannot identify a cause. Evaluate the cascade fallback with mocked tests first. Improve the rules and prompt fairly on development data, then freeze before independently prepared held-out data. No paid follow-up is part of the current checks.
 
-Eight anonymized Uvicorn/Go development cases are committed under [data/recorded-dev/2026-11-02-kind](data/recorded-dev/2026-11-02-kind). [Provenance and A1 results](eval/2026-11-02-kind) preserve the source run and original/published dataset hashes. A fresh replay on 5 November reproduced 24/24 correct A1 attempts, zero errors and zero unsupported conclusions.
+## Run and inspect
 
-```bash
-python tools/run_local_lab.py pilot --cases data/recorded-dev/2026-11-02-kind --output .local/runs/recorded-a1-replay --variants A1 --repetitions 3
-```
-
-Replay needs no cluster or model credentials. The [first paired model pilot](eval/2026-11-05-kind-paired) preserved all results, including provider failures and citation-coverage limitations. Next: offline provider diagnostics and scoring review before another authorized model run. These development results do not establish generalization or model superiority.
-
-## Repository contents
-
-| Path | Purpose |
-| --- | --- |
-| src/readiness_agent | Contracts, rules, model adapter, collector, replay and CLI |
-| data/dev/evidence | Synthetic input bundles |
-| data/dev/labels | Separate scoring labels |
-| tools/generate_dev_fixtures.py | Reproduce development fixtures in a new directory |
-| tests | Offline contract, replay, collector and provider-adapter tests |
-| demo | Disposable application, Dockerfile and Pod manifest |
-| lab | Uvicorn and Go development workloads with a real HTTP dependency |
-| tools/run_local_lab.py | Local preflight, recording, pilot replay and cleanup |
-| docs/local-lab.md | Exact local pilot commands and verification limits |
-| docs/usage.md | Commands and operating limits |
-| docs/evaluation.md | Scoring, freezing and experiment boundaries |
-| docs/phase-2.md | Broader experiment design and staged expansion |
-| docs/status.md | Implemented, verified and pending work |
-| .github/workflows/ci.yml | Offline checks on Python 3.11–3.13 |
+- [Local recorder and cleanup](docs/local-lab.md): dedicated kind lab, not Azure provisioning.
+- [Usage and provider configuration](docs/usage.md): paid calls require an explicit flag.
+- [Evaluation and freeze](docs/evaluation.md): code hashes normalize Python line endings; dataset bytes remain exact. Python patch versions stay strict.
+- [Security](docs/security.md): collector RBAC, CodeQL, Trivy and authorization checks.
+- [GitHub recording workflow](docs/github-actions-pilot.md): eight real development recordings and A1 replay.
 
 ## Boundaries
 
-No Azure resources are provisioned or cluster permissions changed. Secret objects are never read. Logs may still contain sensitive data: inspect bundles before provider submission or publication. Redaction is best effort, not a confidentiality guarantee.
-
-The provider adapter has no automatic retries. Model calls may incur charges; CI and default commands never make them.
-
-Keep rules if they suffice. Use the model for explanations if that is its only demonstrated benefit. Automated remediation requires a separate safety and outcome evaluation.
-
-## Security
-
-[Security controls and verification](docs/security.md) describe the restricted collector RBAC, pinned Actions, CodeQL analysis, Trivy dependency/secret gates and disposable kind authorization checks. Scans do not replace evidence review or establish production readiness.
+The collector reads named Pods, Events and logs; it does not read Secret objects or mutate workloads. It uses the credentials of the explicitly selected kubeconfig context; restricted RBAC requires a dedicated identity. Review logs before provider submission: pattern-based redaction is incomplete, and prompt-injection resistance is not established. The adapter has no automatic retries. Entra model authentication, temporally aware evidence, built-image scanning and live AKS validation remain pending. A green pipeline does not establish production readiness.

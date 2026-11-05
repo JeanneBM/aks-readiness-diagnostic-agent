@@ -6,6 +6,14 @@ import json
 
 CAUSES = {"probe_port_mismatch", "probe_path_mismatch", "dependency_unavailable",
           "healthy", "insufficient_evidence"}
+RECOMMENDATIONS = {
+    "healthy": "Continue monitoring this snapshot; verify again if readiness changes.",
+    "probe_port_mismatch": "Compare the configured probe port with independently observed listener information; request operator review before changes.",
+    "probe_path_mismatch": "Compare the probe path with documented or observed readiness routes; request operator review before changes.",
+    "dependency_unavailable": "Review the dependency health and application configuration using authorized read-only checks.",
+    "insufficient_evidence": "Gather current readiness status, probe configuration and relevant logs using authorized read-only checks.",
+}
+
 KINDS = {"pod_status", "probe_config", "probe_result", "app_log", "limitation"}
 
 

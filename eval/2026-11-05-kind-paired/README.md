@@ -2,7 +2,7 @@
 
 ## Result
 
-Eight preserved kind development cases, three repetitions each. These are known development data, not held-out validation. The user ran the pilot locally against an Azure deployment (alias redacted), reported as gpt-4.1-nano version 2025-04-14, GlobalStandard. The published manifest records a redacted deployment alias and API settings, not immutable model metadata.
+Eight preserved kind development cases, three repetitions each. These are known development data, not held-out validation. I ran the pilot locally against an Azure deployment (alias redacted), reported as gpt-4.1-nano version 2025-04-14, GlobalStandard. The published manifest records a redacted deployment alias and API settings, not immutable model metadata.
 
 | Variant | Correct attempts | Correct cases (majority) | Provider errors | Model calls | Reported tokens |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -35,7 +35,7 @@ The final ten C1 calls fail consecutively, starting at R005 repetition 3. This i
 
 The source ZIP is identified by `provenance.json`. The deployment alias is replaced with `deployment-redacted` and the endpoint hash is removed from the published manifest. No API key or raw endpoint is present. Source and published hashes plus transformations are recorded in provenance.json. The redacted manifest is historical provenance, not a ready-to-use model configuration or freeze. The reviewed outputs contain generic lab routes, evidence IDs and diagnoses, not raw customer logs. Original error metadata is deliberately preserved without invented details.
 
-Reported pilot usage: 13,036 prompt tokens and 1,261 completion tokens. Ten error attempts have no usage metadata, so this is not a complete billing statement. A later single-call check reported in chat used 682 tokens and returned insufficient_evidence for R005; it is outside this archive and is not included in the pilot metrics or preserved as an original result file.
+Reported pilot usage: 13,036 prompt tokens and 1,261 completion tokens. Ten error attempts have no usage metadata, so this is not a complete billing statement. A separate single-call check used 682 reported tokens. Its raw result is not preserved here, so it is excluded from pilot metrics and independently verifiable evidence.
 
 ## Next work — offline first
 
@@ -43,3 +43,7 @@ Reported pilot usage: 13,036 prompt tokens and 1,261 completion tokens. Ten erro
 2. Review evidence scoring and the R002/R003/R005 explanations; keep cause correctness separate from citation coverage and human semantic assessment.
 3. Add configurable request pacing for a future explicitly authorized run; preserve errors and avoid silent retries. Do not rerun paid calls as part of this review.
 4. After fair development improvements and an explicitly authorized follow-up pilot, freeze implementation/model settings before independently prepared held-out data.
+
+## Subsequent citation review
+
+[Rubric v2](rubric-v2) provides a post-hoc rescore of these same responses. C1 accuracy remains 9/24 and provider errors remain ten; conservative risk flags decrease from six to three. This report and the original response files retain the initial scoring.

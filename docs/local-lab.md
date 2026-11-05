@@ -113,4 +113,4 @@ The second command deletes everything in the named local cluster. Do not reuse a
 
 ## Verification boundary
 
-The Python contracts, metrics, collector behavior and ASGI response logic are tested offline. Native Go compilation, actual HTTP responses and the log contract passed CI run 40381715977; its real log capture is preserved under tests/golden. The complete Docker/kind eight-case recording and A1 replay subsequently passed Actions run 41471820620 on 2 November 2026. Preserved recordings establish this development flow, not live AKS validation or model quality. C1/H results remain pending.
+The complete eight-case Docker/kind recording and A1 replay passed [Actions run 41471820620](https://github.com/JeanneBM/aks-readiness-diagnostic-agent/actions/runs/41471820620) on 2 November 2026. Native Go process output and provenance are preserved under tests/golden. The first paired model pilot is documented under eval/2026-11-05-kind-paired. These are instrumented development workloads, not live AKS validation or independent evidence of model advantage. See docs/status.md for current limits and next experiments.

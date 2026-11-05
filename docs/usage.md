@@ -90,3 +90,9 @@ kubectl --context YOUR_CONTEXT delete namespace readiness-lab
 ```
 
 This deletes the disposable namespace, not billable Azure resources such as AKS or ACR.
+
+## Safe output and portable code fingerprints
+
+New provider requests restrict evidence IDs to the current bundle and recommendations to fixed templates. The adapter replaces the returned recommendation with the template for the parsed cause even if a provider ignores the strict schema. Model summaries and uncertainty remain untrusted text; do not copy commands from them. ID validity is not semantic evidence support.
+
+Python source hashes use UTF-8 with normalized LF newlines (`code_hash_format: utf8-lf-v1`). `.gitattributes` also requests LF for Python checkouts. Dataset hashes still use original bytes. Python patch versions intentionally remain strict for freeze checks; recreate a development freeze after a runtime or implementation change. Historical manifests remain historical and are not rewritten.

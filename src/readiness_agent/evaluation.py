@@ -17,13 +17,18 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
+def source_digest(path):
+    """Canonicalize text newlines only; evidence/data keep exact byte hashes."""
+    return digest(Path(path).read_text(encoding="utf-8").encode("utf-8"))
+
+
 def fingerprint(cases, model_config=None):
-    code = {p.name: digest(p.read_bytes()) for p in sorted(Path(__file__).parent.glob("*.py"))}
+    code = {p.name: source_digest(p) for p in sorted(Path(__file__).parent.glob("*.py"))}
     data = {p.relative_to(cases).as_posix(): digest(p.read_bytes())
             for p in sorted(Path(cases).rglob("*.json"))}
     splits = sorted({json.loads(p.read_text(encoding="utf-8"))["split"]
                      for p in (Path(cases) / "labels").glob("*.json")})
-    return {"schema": 2, "python": platform.python_version(), "code": code, "data": data,
+    return {"schema": 2, "code_hash_format": "utf8-lf-v1", "python": platform.python_version(), "code": code, "data": data,
             "data_splits": splits, "prompt_sha256": digest(PROMPT.encode()),
             "output_schema_sha256": digest(json.dumps(SCHEMA, sort_keys=True).encode()),
             "model_config": model_config}

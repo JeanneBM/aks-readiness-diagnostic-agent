@@ -1,0 +1,18 @@
+{
+  "cause": "probe_path_mismatch",
+  "required_evidence_ids": [
+    "probe"
+  ],
+  "split": "dev",
+  "origin": "local-kind-recorded",
+  "framework": "uvicorn",
+  "scenario": "path",
+  "evidence_options": [
+    [
+      "logs"
+    ],
+    [
+      "startup"
+    ]
+  ]
+}
