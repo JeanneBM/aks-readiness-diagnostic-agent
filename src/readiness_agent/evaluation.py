@@ -83,6 +83,8 @@ def score(diagnosis, truth):
                  if truth["required_evidence_ids"] or options else None)
     unsupported = diagnosis.cause != "insufficient_evidence" and (not correct or supported is False)
     return {"cause_correct": correct, "rubric_evidence_covered": supported,
+            "cause_mismatch": not correct and diagnosis.cause != "insufficient_evidence",
+            "citation_coverage_gap": supported is False,
             "appropriate_abstention": correct if truth["cause"] == "insufficient_evidence" else None,
             "unsupported_conclusion": unsupported, "diagnostic_risk": unsupported}
 
@@ -126,6 +128,7 @@ def model_configuration(client):
         return None
     return {"provider": client.provider, "model": client.model, "api_version": client.api_version,
             "endpoint_sha256": digest(client.endpoint.encode()),
+            "min_request_interval_seconds": getattr(client, "min_request_interval_seconds", 0),
             **getattr(client, "request_settings", {"temperature": 0, "max_tokens": 700})}
 
 
@@ -178,8 +181,9 @@ def evaluate(cases_path, output, variants, client=None, manifest=None, repetitio
                                diagnostic_risk=True)
                 except ContractError:
                     row.update(error_kind="CONTRACT_ERROR", diagnostic_risk=True, unsupported_conclusion=True)
-                except ProviderError:
+                except ProviderError as error:
                     row["error_kind"] = "PROVIDER_ERROR"
+                    row["provider_error"] = error.details
                 except Exception:
                     row["error_kind"] = "EXECUTION_ERROR"
                 row["seconds"] = time.perf_counter() - started

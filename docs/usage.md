@@ -32,6 +32,12 @@ python -m readiness_agent.cli evaluate --cases data/dev --variants A1,C1,H --rep
 
 C1 and H are independent runs; H can make an additional request on cases where A1 abstains. Temperature zero does not guarantee deterministic output. There are no warm-up requests or retries. HTTP errors, timeouts, refusals and malformed outputs remain errors. The request timeout is 45 seconds; full runs can take much longer.
 
+Optional pacing: set `READINESS_MIN_REQUEST_INTERVAL_SECONDS` to a number from 0 to 60 (default 0). This enforces a minimum interval between request starts within one sequential client, including failed calls; it does not retry requests or guarantee quota compliance. The setting is recorded in new manifests. Old freezes must be regenerated after this implementation change.
+
+Provider errors now preserve allowlisted `provider_error` metadata: HTTP status, integer Retry-After from 0 to 3600 seconds, or a transport category (`timeout` / `connection`). HTTP-date Retry-After values, raw bodies, exception text, URLs and credentials are not stored. A missing field means unavailable information, not zero wait. Historical pilot errors cannot be reconstructed.
+
+Per-attempt scores expose `cause_mismatch` and `citation_coverage_gap` separately. Existing `unsupported_conclusion` and `diagnostic_risk` retain their conservative scoring meaning; they are not human semantic judgments. Original pilot files remain unchanged.
+
 The manifest stores provider, model/deployment, API version and an endpoint hash, never the key. It does not pin the provider's immutable model version. Preserve deployment metadata separately for reproducibility.
 
 ## Freeze

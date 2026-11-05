@@ -1,6 +1,8 @@
 """Optional HTTPS Chat Completions adapter. No live calls occur on import."""
 import json
 import os
+import math
+import time
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
@@ -39,7 +41,7 @@ class NoRedirect(HTTPRedirectHandler):
 
 class ModelClient:
     def __init__(self, endpoint, api_key, model, provider="azure", api_version="2024-10-21",
-                 token_parameter="max_tokens", temperature=0):
+                 token_parameter="max_tokens", temperature=0, min_request_interval_seconds=0):
         parsed = urlsplit(endpoint)
         if (parsed.scheme != "https" or parsed.username or parsed.password or parsed.query
                 or parsed.fragment or parsed.port not in (None, 443)
@@ -58,6 +60,13 @@ class ModelClient:
             raise ValueError("Unsupported token budget parameter")
         if temperature not in (0, None):
             raise ValueError("Temperature must be zero or omitted")
+        if (isinstance(min_request_interval_seconds, bool)
+                or not isinstance(min_request_interval_seconds, (int, float))
+                or not math.isfinite(min_request_interval_seconds)
+                or not 0 <= min_request_interval_seconds <= 60):
+            raise ValueError("Request interval must be between 0 and 60 seconds")
+        self.min_request_interval_seconds = min_request_interval_seconds
+        self._last_request_started = None
         self.endpoint, self.key, self.model = endpoint.rstrip("/"), api_key, model
         self.provider, self.api_version = provider, api_version
         self.request_settings = {token_parameter: 700}
@@ -70,7 +79,8 @@ class ModelClient:
                    os.environ.get("READINESS_MODEL", ""), os.environ.get("READINESS_PROVIDER", "azure"),
                    os.environ.get("READINESS_API_VERSION", "2024-10-21"),
                    os.environ.get("READINESS_TOKEN_PARAMETER", "max_tokens"),
-                   None if os.environ.get("READINESS_TEMPERATURE", "0") == "omit" else 0)
+                   None if os.environ.get("READINESS_TEMPERATURE", "0") == "omit" else 0,
+                   float(os.environ.get("READINESS_MIN_REQUEST_INTERVAL_SECONDS", "0")))
 
     def diagnose(self, bundle):
         payload = {
@@ -90,14 +100,25 @@ class ModelClient:
             headers["Authorization"] = "Bearer " + self.key
             payload["model"] = self.model
         request = Request(url, data=json.dumps(payload).encode(), headers=headers, method="POST")
+        if self._last_request_started is not None:
+            remaining = self.min_request_interval_seconds - (time.monotonic() - self._last_request_started)
+            if remaining > 0:
+                time.sleep(remaining)
+        self._last_request_started = time.monotonic()
         try:
             with build_opener(NoRedirect()).open(request, timeout=45) as response:
                 raw = response.read(256001)
         except HTTPError as error:
             # Response bodies may contain sensitive request details. Do not print them.
-            raise ProviderError(f"Provider HTTP error {error.code}; no automatic retry") from None
-        except (URLError, TimeoutError, OSError):
-            raise ProviderError("Provider transport failure; no automatic retry") from None
+            value = error.headers.get("Retry-After", "") if error.headers else ""
+            retry_after = int(value) if is_bounded_decimal(value) else None
+            raise ProviderError(f"Provider HTTP error {error.code}; no automatic retry",
+                                http_status=error.code, retry_after_seconds=retry_after) from None
+        except (URLError, TimeoutError, OSError) as error:
+            reason = error.reason if isinstance(error, URLError) else error
+            category = "timeout" if isinstance(reason, TimeoutError) else "connection"
+            raise ProviderError("Provider transport failure; no automatic retry",
+                                transport_category=category) from None
         if len(raw) > 256000:
             raise ContractError("Provider response exceeded size limit")
         try:
@@ -118,3 +139,8 @@ class ModelClient:
         except (KeyError, IndexError, TypeError, AttributeError, ValueError):
             raise ContractError("Provider response did not match the diagnostic contract") from None
         return diagnosis, usage
+
+
+def is_bounded_decimal(value):
+    """Accept bounded delta-seconds only; do not retain arbitrary header text."""
+    return isinstance(value, str) and value.isascii() and value.isdecimal() and len(value) <= 4

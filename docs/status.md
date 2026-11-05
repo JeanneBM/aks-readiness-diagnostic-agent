@@ -43,7 +43,11 @@ The repository now includes anonymized real development cluster evidence from th
 ## Next experiment
 
 1. Review the preserved eight-case dataset and provenance; use the committed recordings rather than collecting them again.
-2. Review the preserved paired pilot offline; add safe provider diagnostics and inspect citation scoring before any explicitly authorized paid follow-up.
+2. Review the preserved paired pilot explanations and evidence rubric; decide on fair development improvements before any explicitly authorized paid follow-up.
 3. Strengthen A1 and model prompts fairly, then freeze them.
 4. Independently prepare held-out cases and run the paired diagnostic evaluation.
 5. Decide whether to keep rules, add an explanation-only assistant or justify a separate remediation stage.
+
+## Offline follow-up — 5 November 2026
+
+Added safe provider error metadata, configurable request pacing (0–60 seconds, no automatic retries) and separate cause-mismatch/citation-gap fields while preserving existing risk scoring. Offline verification: 56 tests discovered, 55 passed, one fresh native-Go capture test skipped. New tests cover HTTP 429 persistence, metadata redaction, transport categories, pacing after failures and the recorded R003 citation gap. No live provider requests were made. Historical pilot files are unchanged; the ten historical provider errors remain unexplained.
