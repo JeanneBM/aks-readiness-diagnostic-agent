@@ -2,6 +2,12 @@
 
 Goal: record eight development cases from real Uvicorn and Go HTTP applications, then replay A1/C1/H on exactly those bundles. No AKS, ACR or Azure infrastructure is created.
 
+## Existing recordings: start with replay
+
+The eight cases were recorded successfully by [Actions run #2](https://github.com/JeanneBM/aks-readiness-diagnostic-agent/actions/runs/41471820620) on 2 November 2026. The anonymized dataset is committed under data/recorded-dev/2026-11-02-kind; provenance and original/sanitized A1 results are under eval/2026-11-02-kind. A1 scored 24/24 correct attempts with zero errors. A fresh replay on 5 November reproduced that result without model calls.
+
+To continue the pilot, use the committed dataset as `--cases data/recorded-dev/2026-11-02-kind` in the A1 or optional A1/C1/H pilot command below. No new recording or cluster is needed for replay. Docker/kind prerequisites apply only when collecting new evidence. Provider configuration is still required for C1/H.
+
 ## Prerequisites
 
 - Python 3.11 or newer and the package installed with `python -m pip install -e .`.
@@ -107,4 +113,4 @@ The second command deletes everything in the named local cluster. Do not reuse a
 
 ## Verification boundary
 
-The Python contracts, metrics, collector behavior and ASGI response logic are tested offline. Native Go compilation, actual HTTP responses and the log contract passed CI run 40381715977; its real log capture is preserved under tests/golden. Docker, kind and kubectl remain unavailable in the preparation environment, so container builds and the complete Kubernetes recording pipeline still require local verification. No kind recording or model result is pre-populated or claimed.
+The Python contracts, metrics, collector behavior and ASGI response logic are tested offline. Native Go compilation, actual HTTP responses and the log contract passed CI run 40381715977; its real log capture is preserved under tests/golden. The complete Docker/kind eight-case recording and A1 replay subsequently passed Actions run 41471820620 on 2 November 2026. Preserved recordings establish this development flow, not live AKS validation or model quality. C1/H results remain pending.
