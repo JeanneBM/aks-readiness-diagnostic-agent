@@ -1,0 +1,35 @@
+{
+  "case_id": "R005",
+  "variant": "C1",
+  "repetition": 2,
+  "split": "dev",
+  "framework": "go",
+  "ground_truth": "healthy",
+  "status": "OK",
+  "usage": {
+    "completion_tokens": 83,
+    "prompt_tokens": 599,
+    "total_tokens": 682
+  },
+  "model_calls": 1,
+  "rubric_evidence_covered": true,
+  "diagnostic_risk": false,
+  "unsupported_conclusion": false,
+  "diagnosis": {
+    "cause": "insufficient_evidence",
+    "summary": "The available evidence does not conclusively determine the cause of readiness status.",
+    "evidence_ids": [
+      "status",
+      "probe",
+      "events-empty",
+      "logs",
+      "startup",
+      "snapshot-limit"
+    ],
+    "recommendation": "Perform an active probe or check the container's actual response at the readiness path and port.",
+    "uncertainty": "High; limited evidence and potential log staleness prevent definitive diagnosis."
+  },
+  "cause_correct": false,
+  "appropriate_abstention": null,
+  "seconds": 1.3876326000317931
+}

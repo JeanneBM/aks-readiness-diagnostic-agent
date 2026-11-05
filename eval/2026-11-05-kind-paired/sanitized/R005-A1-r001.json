@@ -1,0 +1,26 @@
+{
+  "case_id": "R005",
+  "variant": "A1",
+  "repetition": 1,
+  "split": "dev",
+  "framework": "go",
+  "ground_truth": "healthy",
+  "status": "OK",
+  "usage": {},
+  "model_calls": 0,
+  "rubric_evidence_covered": true,
+  "diagnostic_risk": false,
+  "unsupported_conclusion": false,
+  "diagnosis": {
+    "cause": "healthy",
+    "summary": "The recorded Pod readiness condition is true.",
+    "evidence_ids": [
+      "status"
+    ],
+    "recommendation": "No corrective action from this snapshot.",
+    "uncertainty": "Readiness is not proof of business correctness or future availability."
+  },
+  "cause_correct": true,
+  "appropriate_abstention": null,
+  "seconds": 4.0499959141016006e-05
+}

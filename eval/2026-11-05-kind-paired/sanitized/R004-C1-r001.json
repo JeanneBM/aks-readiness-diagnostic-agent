@@ -1,0 +1,31 @@
+{
+  "case_id": "R004",
+  "variant": "C1",
+  "repetition": 1,
+  "split": "dev",
+  "framework": "uvicorn",
+  "ground_truth": "dependency_unavailable",
+  "status": "OK",
+  "usage": {
+    "completion_tokens": 79,
+    "prompt_tokens": 1064,
+    "total_tokens": 1143
+  },
+  "model_calls": 1,
+  "rubric_evidence_covered": true,
+  "diagnostic_risk": false,
+  "unsupported_conclusion": false,
+  "diagnosis": {
+    "cause": "dependency_unavailable",
+    "summary": "The readiness probe fails due to an unavailable dependency, resulting in a 503 response.",
+    "evidence_ids": [
+      "events",
+      "logs"
+    ],
+    "recommendation": "Verify the availability of the dependency service that the application relies on, and check network connectivity and service status.",
+    "uncertainty": "Moderate, as the exact dependency causing the failure is not explicitly identified."
+  },
+  "cause_correct": true,
+  "appropriate_abstention": null,
+  "seconds": 1.3163161999545991
+}

@@ -1,0 +1,45 @@
+{
+  "schema": 2,
+  "python": "3.12.10",
+  "code": {
+    "__init__.py": "ef8af474172748e8f81ca651706145a232601bdeb3cd12a305901463dbd5a276",
+    "baseline.py": "bea1e6038744980099800c7b7ffae81ed60199344d538857f3c0c6b58f2183ac",
+    "cli.py": "5564642803d522c70693f11149b490bfdc29f9df2ee0bd81f78c683238ec415c",
+    "collector.py": "7cbe7f6d549248b2d7076fab4de37eb0f187c6d594ea26d10b085b9c382ad4b9",
+    "errors.py": "a397f682fc9577f375d0c831964121f227cbdb25c6bdd98d66ef855d52e5ad8f",
+    "evaluation.py": "d27fcc2a4ba2a2459975ec3d7a8aa0a8634da7294aae1eb13422490cb8d1d64c",
+    "llm.py": "ff3ddf44467a1d911bb4f055f6f74d3b02565241b30100269c437b430a4d8f45",
+    "models.py": "3e94c22eb4681f477e5bc22eb090c3a2e580f7321baf5e63f3094884c0c680fc"
+  },
+  "data": {
+    "evidence/R001.json": "b5317d6a510631c4528ad198776b56facb3d62d2e01d1c92e81a81f0435d5904",
+    "evidence/R002.json": "c9e04197084f6e1e7f763dbb2098046f28d7eade60b94a98b5358ac4c5f20c1f",
+    "evidence/R003.json": "10d80c933712e835e7bfefc351ab64198c18ef5e6ba75acb4c6876c81f218c20",
+    "evidence/R004.json": "fe6cf0a670c261769c9132c36e1bedcd6d24e575e32d2e2bb5dfbe819270df87",
+    "evidence/R005.json": "26dd5d669b00244a52053e0ee787d2e1eab7e7d2439a08be1da6cf57999baedd",
+    "evidence/R006.json": "63c794be0fe93070e5d066af49b9be3576fe3b92376d843bdaa17156778a5df1",
+    "evidence/R007.json": "37dbb3ecacd96568a1940cb9cfab9b72314673c5556cd96edbea7f29bc905af2",
+    "evidence/R008.json": "1f60bac037e39420af64010cd0afd82600d17878875c9a36f5fe262da6cab9e1",
+    "labels/R001.json": "ab3986c1b35ea0bd28cf2db2e583596a61203091ba734fd92915af823f64de49",
+    "labels/R002.json": "75a7d20ba340eaf97fb83f1c2489a4cd599c22da3e54ca78808052c2ce08cadb",
+    "labels/R003.json": "f523dc32c6234c6b49dbaec0a94fdf1d6fe20d83660238535fd2a2579746755b",
+    "labels/R004.json": "e406f8e338b9ef4594d4b459a05d9ee26f51487a5c90687b901c4010efbd6f30",
+    "labels/R005.json": "1b16cbf3efdca53887b701518943ef9cfbfb761f6c0775688bca643c2ec80cfe",
+    "labels/R006.json": "c8b71283aaf90114af0e0b5c082956423e2880ab50dc15453ff2ca8fa53013a8",
+    "labels/R007.json": "8b8e732800f437268ea7be28cccdd042787a21f5b2d724df88554b1079e02148",
+    "labels/R008.json": "3adf3e3e0c7a3312410bdfbaf3b955c8515f979a2333c7d946cf747de12d4956",
+    "recording.json": "50d3f1ba2d1cf78e42b4adf95782a034baea5c17ab3fea7264f813c85faa4eca"
+  },
+  "data_splits": [
+    "dev"
+  ],
+  "prompt_sha256": "642cb373ca26a9fdd08287fd6a599f16b188fd49151cab094fde3d7bc3a624b1",
+  "output_schema_sha256": "b2261bca328d04086e7e494a0ed58271bbff90217aff01e71c93b3b8949871e9",
+  "model_config": {
+    "provider": "azure",
+    "model": "deployment-redacted",
+    "api_version": "2024-10-21",
+    "max_tokens": 700,
+    "temperature": 0
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "case_id": "R002",
+  "variant": "C1",
+  "repetition": 2,
+  "split": "dev",
+  "framework": "uvicorn",
+  "ground_truth": "probe_port_mismatch",
+  "status": "OK",
+  "usage": {
+    "completion_tokens": 107,
+    "prompt_tokens": 914,
+    "total_tokens": 1021
+  },
+  "model_calls": 1,
+  "rubric_evidence_covered": false,
+  "diagnostic_risk": true,
+  "unsupported_conclusion": true,
+  "diagnosis": {
+    "cause": "dependency_unavailable",
+    "summary": "The readiness probe failed due to a connection refused error, indicating the dependency (service or application) on port 9090 is not available.",
+    "evidence_ids": [
+      "events"
+    ],
+    "recommendation": "Verify if the application is listening on port 9090 and accessible at the /ready endpoint. Check container logs for startup errors or misconfigurations.",
+    "uncertainty": "Uncertainty exists whether the application is not yet ready or if there is a network or configuration issue preventing access to the port."
+  },
+  "cause_correct": false,
+  "appropriate_abstention": null,
+  "seconds": 1.3273642999120057
+}

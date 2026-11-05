@@ -1,0 +1,32 @@
+{
+  "case_id": "R001",
+  "variant": "C1",
+  "repetition": 1,
+  "split": "dev",
+  "framework": "uvicorn",
+  "ground_truth": "healthy",
+  "status": "OK",
+  "usage": {
+    "completion_tokens": 66,
+    "prompt_tokens": 977,
+    "total_tokens": 1043
+  },
+  "model_calls": 1,
+  "rubric_evidence_covered": true,
+  "diagnostic_risk": false,
+  "unsupported_conclusion": false,
+  "diagnosis": {
+    "cause": "healthy",
+    "summary": "The pod appears healthy based on the readiness probe and logs.",
+    "evidence_ids": [
+      "status",
+      "probe",
+      "logs"
+    ],
+    "recommendation": "No action needed; monitor for any future failures.",
+    "uncertainty": "Limited log freshness and no failure events support a healthy assessment, but logs may be stale."
+  },
+  "cause_correct": true,
+  "appropriate_abstention": null,
+  "seconds": 1.4252844001166523
+}

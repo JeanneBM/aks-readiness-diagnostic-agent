@@ -4,7 +4,7 @@
 
 A runnable, read-only diagnostic experiment with an explicit baseline, optional model adapter, rules-to-model cascade, recorded-evidence replay, bounded Kubernetes collector and disposable demo application.
 
-**Status:** development implementation with 18 synthetic fixtures and eight real kind recordings. A1 achieved 24/24 correct attempts (three repetitions per case), with zero errors and no model calls. C1/H on recorded data, held-out evaluation and live AKS validation remain pending.
+**Status:** development implementation with 18 synthetic fixtures and eight real kind recordings. A1 achieved 24/24 correct attempts (three repetitions per case), with zero errors and no model calls. The first recorded A1/C1/H pilot is complete: C1 achieved 9/24 correct attempts with ten provider failures; H used only rules. Held-out evaluation and live AKS validation remain pending.
 
 ## Scope
 
@@ -76,7 +76,7 @@ Eight anonymized Uvicorn/Go development cases are committed under [data/recorded
 python tools/run_local_lab.py pilot --cases data/recorded-dev/2026-11-02-kind --output .local/runs/recorded-a1-replay --variants A1 --repetitions 3
 ```
 
-Replay needs no cluster or model credentials. The next experiment is repeated A1/C1/H on these same recordings with a configured provider; recording the eight cases again is unnecessary. These development results do not establish generalization or model superiority.
+Replay needs no cluster or model credentials. The [first paired model pilot](eval/2026-11-05-kind-paired) preserved all results, including provider failures and citation-coverage limitations. Next: offline provider diagnostics and scoring review before another authorized model run. These development results do not establish generalization or model superiority.
 
 ## Repository contents
 

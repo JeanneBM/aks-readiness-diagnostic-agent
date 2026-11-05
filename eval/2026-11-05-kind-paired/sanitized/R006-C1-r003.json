@@ -1,0 +1,16 @@
+{
+  "case_id": "R006",
+  "variant": "C1",
+  "repetition": 3,
+  "split": "dev",
+  "framework": "go",
+  "ground_truth": "probe_port_mismatch",
+  "status": "ERROR",
+  "usage": {},
+  "model_calls": 1,
+  "rubric_evidence_covered": false,
+  "diagnostic_risk": false,
+  "unsupported_conclusion": false,
+  "error_kind": "PROVIDER_ERROR",
+  "seconds": 0.414769200142473
+}

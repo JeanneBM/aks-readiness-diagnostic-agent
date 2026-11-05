@@ -1,0 +1,35 @@
+{
+  "case_id": "R005",
+  "variant": "C1",
+  "repetition": 1,
+  "split": "dev",
+  "framework": "go",
+  "ground_truth": "healthy",
+  "status": "OK",
+  "usage": {
+    "completion_tokens": 90,
+    "prompt_tokens": 599,
+    "total_tokens": 689
+  },
+  "model_calls": 1,
+  "rubric_evidence_covered": true,
+  "diagnostic_risk": false,
+  "unsupported_conclusion": false,
+  "diagnosis": {
+    "cause": "insufficient_evidence",
+    "summary": "The available evidence does not conclusively determine the readiness cause.",
+    "evidence_ids": [
+      "status",
+      "probe",
+      "events-empty",
+      "logs",
+      "startup",
+      "snapshot-limit"
+    ],
+    "recommendation": "Perform a direct HTTP GET request to the /ready endpoint on port 8080 to verify the probe response.",
+    "uncertainty": "High; the logs and events do not provide definitive information about the readiness probe success or failure."
+  },
+  "cause_correct": false,
+  "appropriate_abstention": null,
+  "seconds": 1.408909099875018
+}

@@ -1,0 +1,31 @@
+{
+  "case_id": "R003",
+  "variant": "C1",
+  "repetition": 3,
+  "split": "dev",
+  "framework": "uvicorn",
+  "ground_truth": "probe_path_mismatch",
+  "status": "OK",
+  "usage": {
+    "completion_tokens": 92,
+    "prompt_tokens": 991,
+    "total_tokens": 1083
+  },
+  "model_calls": 1,
+  "rubric_evidence_covered": false,
+  "diagnostic_risk": true,
+  "unsupported_conclusion": true,
+  "diagnosis": {
+    "cause": "probe_path_mismatch",
+    "summary": "The readiness probe is configured to use a path (/wrong-readiness-path) that returns 404, indicating a mismatch with the application's available routes.",
+    "evidence_ids": [
+      "probe",
+      "logs"
+    ],
+    "recommendation": "Verify the correct readiness endpoint path in the application's routing configuration and update the readiness probe accordingly.",
+    "uncertainty": "Uncertain whether the application has a different readiness route or if the probe configuration is incorrect."
+  },
+  "cause_correct": true,
+  "appropriate_abstention": null,
+  "seconds": 1.5104011001531035
+}

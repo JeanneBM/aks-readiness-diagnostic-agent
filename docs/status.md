@@ -20,7 +20,7 @@
 
 [Actions run 41471820620](https://github.com/JeanneBM/aks-readiness-diagnostic-agent/actions/runs/41471820620) completed successfully on 2 November: eight real kind cases covering healthy, port, path and dependency scenarios for Uvicorn and Go. Anonymized evidence and separate labels are preserved in data/recorded-dev/2026-11-02-kind; source identity, hashes and original/sanitized A1 results are in eval/2026-11-02-kind.
 
-A fresh replay on 5 November reproduced 24/24 correct A1 attempts across eight cases and three repetitions, with zero errors, zero unsupported conclusions and zero model calls. This verifies replay of known development cases. C1/H, held-out evaluation and live AKS validation remain pending.
+A fresh replay on 5 November reproduced 24/24 correct A1 attempts across eight cases and three repetitions, with zero errors, zero unsupported conclusions and zero model calls. This verifies replay of known development cases. The first C1/H pilot is now preserved in [eval/2026-11-05-kind-paired](../eval/2026-11-05-kind-paired): C1 9/24 correct attempts, ten provider errors; H 24/24 using rules only. Held-out evaluation and live AKS validation remain pending.
 
 ## Historical verification boundary
 
@@ -43,7 +43,7 @@ The repository now includes anonymized real development cluster evidence from th
 ## Next experiment
 
 1. Review the preserved eight-case dataset and provenance; use the committed recordings rather than collecting them again.
-2. Configure a provider and run repeated A1/C1/H on data/recorded-dev/2026-11-02-kind, then inspect per-case diagnoses, errors, latency and token usage.
+2. Review the preserved paired pilot offline; add safe provider diagnostics and inspect citation scoring before any explicitly authorized paid follow-up.
 3. Strengthen A1 and model prompts fairly, then freeze them.
 4. Independently prepare held-out cases and run the paired diagnostic evaluation.
 5. Decide whether to keep rules, add an explanation-only assistant or justify a separate remediation stage.

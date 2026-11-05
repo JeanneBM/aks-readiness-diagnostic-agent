@@ -1,0 +1,16 @@
+{
+  "case_id": "R008",
+  "variant": "C1",
+  "repetition": 1,
+  "split": "dev",
+  "framework": "go",
+  "ground_truth": "dependency_unavailable",
+  "status": "ERROR",
+  "usage": {},
+  "model_calls": 1,
+  "rubric_evidence_covered": false,
+  "diagnostic_risk": false,
+  "unsupported_conclusion": false,
+  "error_kind": "PROVIDER_ERROR",
+  "seconds": 0.8365539000369608
+}

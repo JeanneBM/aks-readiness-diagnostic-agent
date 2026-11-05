@@ -1,0 +1,173 @@
+{
+  "schema": 2,
+  "cases": 8,
+  "repetitions": 3,
+  "variants": {
+    "A1": {
+      "cases": 8,
+      "attempts": 24,
+      "correct": 8,
+      "correct_attempts": 24,
+      "errors": 0,
+      "contract_errors": 0,
+      "model_no_answers": 0,
+      "refusals": 0,
+      "truncated_outputs": 0,
+      "filtered_outputs": 0,
+      "provider_errors": 0,
+      "unsupported_conclusions": 0,
+      "diagnostic_risk_attempts": 0,
+      "diagnostic_risk_cases": 0,
+      "rubric_evidence_covered": 24,
+      "rubric_evidence_applicable": 24,
+      "model_calls": 0,
+      "seconds_total": 0.009390299441292882,
+      "tokens_reported": 0,
+      "calls_with_usage": 0,
+      "by_cause": {
+        "dependency_unavailable": {
+          "cases": 2,
+          "correct": 2
+        },
+        "healthy": {
+          "cases": 2,
+          "correct": 2
+        },
+        "probe_path_mismatch": {
+          "cases": 2,
+          "correct": 2
+        },
+        "probe_port_mismatch": {
+          "cases": 2,
+          "correct": 2
+        }
+      },
+      "by_framework": {
+        "go": {
+          "attempts": 12,
+          "correct_attempts": 12
+        },
+        "uvicorn": {
+          "attempts": 12,
+          "correct_attempts": 12
+        }
+      }
+    },
+    "C1": {
+      "cases": 8,
+      "attempts": 24,
+      "correct": 3,
+      "correct_attempts": 9,
+      "errors": 10,
+      "contract_errors": 0,
+      "model_no_answers": 0,
+      "refusals": 0,
+      "truncated_outputs": 0,
+      "filtered_outputs": 0,
+      "provider_errors": 10,
+      "unsupported_conclusions": 6,
+      "diagnostic_risk_attempts": 6,
+      "diagnostic_risk_cases": 2,
+      "rubric_evidence_covered": 8,
+      "rubric_evidence_applicable": 24,
+      "model_calls": 24,
+      "seconds_total": 23.9780881004408,
+      "tokens_reported": 14297,
+      "calls_with_usage": 14,
+      "by_cause": {
+        "dependency_unavailable": {
+          "cases": 2,
+          "correct": 1
+        },
+        "healthy": {
+          "cases": 2,
+          "correct": 1
+        },
+        "probe_path_mismatch": {
+          "cases": 2,
+          "correct": 1
+        },
+        "probe_port_mismatch": {
+          "cases": 2,
+          "correct": 0
+        }
+      },
+      "by_framework": {
+        "go": {
+          "attempts": 12,
+          "correct_attempts": 0
+        },
+        "uvicorn": {
+          "attempts": 12,
+          "correct_attempts": 9
+        }
+      }
+    },
+    "H": {
+      "cases": 8,
+      "attempts": 24,
+      "correct": 8,
+      "correct_attempts": 24,
+      "errors": 0,
+      "contract_errors": 0,
+      "model_no_answers": 0,
+      "refusals": 0,
+      "truncated_outputs": 0,
+      "filtered_outputs": 0,
+      "provider_errors": 0,
+      "unsupported_conclusions": 0,
+      "diagnostic_risk_attempts": 0,
+      "diagnostic_risk_cases": 0,
+      "rubric_evidence_covered": 24,
+      "rubric_evidence_applicable": 24,
+      "model_calls": 0,
+      "seconds_total": 0.006063800072297454,
+      "tokens_reported": 0,
+      "calls_with_usage": 0,
+      "by_cause": {
+        "dependency_unavailable": {
+          "cases": 2,
+          "correct": 2
+        },
+        "healthy": {
+          "cases": 2,
+          "correct": 2
+        },
+        "probe_path_mismatch": {
+          "cases": 2,
+          "correct": 2
+        },
+        "probe_port_mismatch": {
+          "cases": 2,
+          "correct": 2
+        }
+      },
+      "by_framework": {
+        "go": {
+          "attempts": 12,
+          "correct_attempts": 12
+        },
+        "uvicorn": {
+          "attempts": 12,
+          "correct_attempts": 12
+        }
+      }
+    }
+  },
+  "paired_comparisons": {
+    "C1": {
+      "pairs": 8,
+      "baseline_only_correct": 5,
+      "challenger_only_correct": 0,
+      "exact_mcnemar_p": 0.0625,
+      "accuracy_difference_pp": -62.5
+    },
+    "H": {
+      "pairs": 8,
+      "baseline_only_correct": 0,
+      "challenger_only_correct": 0,
+      "exact_mcnemar_p": 1.0,
+      "accuracy_difference_pp": 0.0
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "variants": [
+    "A1",
+    "C1",
+    "H"
+  ],
+  "repetitions": 3,
+  "split": "dev",
+  "aggregation": "absolute majority of all attempts per case; errors remain in denominator"
+}
