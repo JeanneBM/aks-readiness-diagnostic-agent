@@ -16,7 +16,13 @@
 - Sorted Events plus a bounded startup log prefix and explicit empty-window limitations.
 - Uvicorn and Go workloads, real HTTP dependency and local kind recorder/pilot/cleanup commands.
 
-## Verification boundary
+## Recorded development pilot — verified 5 November 2026
+
+[Actions run 41471820620](https://github.com/JeanneBM/aks-readiness-diagnostic-agent/actions/runs/41471820620) completed successfully on 2 November: eight real kind cases covering healthy, port, path and dependency scenarios for Uvicorn and Go. Anonymized evidence and separate labels are preserved in data/recorded-dev/2026-11-02-kind; source identity, hashes and original/sanitized A1 results are in eval/2026-11-02-kind.
+
+A fresh replay on 5 November reproduced 24/24 correct A1 attempts across eight cases and three repetitions, with zero errors, zero unsupported conclusions and zero model calls. This verifies replay of known development cases. C1/H, held-out evaluation and live AKS validation remain pending.
+
+## Historical verification boundary
 
 Local verification on 26 October 2026: 40 automated tests passed, including preregistration, repeated scoring, citation-risk handling, startup-log preservation and ASGI response logic. A1 still matches the 18 synthetic regression labels. These are implementation checks, not a held-out result or evidence that A1 generalizes.
 
@@ -32,12 +38,12 @@ Local follow-up verification: 44 tests discovered, 43 passed and one native-proc
 
 Verified CI follow-up: workflow run 40381715977 passed Python 3.11, 3.12 and 3.13 checks and native-go compilation/capture tests. Actual Go process output and provenance were retrieved from artifact 12679415721 and preserved under tests/golden. This confirms the Go log contract and real HTTP status behavior; it does not validate Docker images, kind recording or model quality. After adding that captured-output regression, local verification found 45 tests: 44 passed and one fresh-process test skipped without a local Go toolchain.
 
-The repository contains no credentials and no recorded real customer or cluster evidence. Generated local runs belong under .local and are ignored by Git.
+The repository now includes anonymized real development cluster evidence from the owned kind lab; it contains no recorded customer evidence. Generated local runs belong under .local and are ignored by Git. The earlier environment limitations above are historical; the successful runner-based recording supersedes the pending kind verification.
 
 ## Next experiment
 
-1. Check prerequisites and record the local Uvicorn/Go development cases with tools/run_local_lab.py.
-2. Inspect evidence, run A1, then run a repeated C1/H pilot with an explicitly configured provider.
+1. Review the preserved eight-case dataset and provenance; use the committed recordings rather than collecting them again.
+2. Configure a provider and run repeated A1/C1/H on data/recorded-dev/2026-11-02-kind, then inspect per-case diagnoses, errors, latency and token usage.
 3. Strengthen A1 and model prompts fairly, then freeze them.
 4. Independently prepare held-out cases and run the paired diagnostic evaluation.
 5. Decide whether to keep rules, add an explanation-only assistant or justify a separate remediation stage.
