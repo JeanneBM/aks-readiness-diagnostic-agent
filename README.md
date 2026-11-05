@@ -4,7 +4,7 @@
 
 A runnable, read-only diagnostic experiment with an explicit baseline, optional model adapter, rules-to-model cascade, recorded-evidence replay, bounded Kubernetes collector and disposable demo application.
 
-**Status:** development implementation with synthetic fixtures. No held-out LLM advantage, live AKS validation or automated repair is claimed.
+**Status:** development implementation with 18 synthetic fixtures and eight real kind recordings. A1 achieved 24/24 correct attempts (three repetitions per case), with zero errors and no model calls. C1/H on recorded data, held-out evaluation and live AKS validation remain pending.
 
 ## Scope
 
@@ -64,9 +64,19 @@ Uvicorn and Go applications, a separate HTTP dependency and a cross-platform rec
 python tools/run_local_lab.py check
 ```
 
-Then follow docs/local-lab.md to record three faults plus a healthy control per framework on a dedicated kind cluster. Both variants replay the same actual recordings; no Azure provisioning is needed. Container builds and the full kind recording flow still require local verification.
+Then follow docs/local-lab.md to record three faults plus a healthy control per framework on a dedicated kind cluster. Both variants replay the same actual recordings; no Azure provisioning is needed. The full recording flow passed [GitHub Actions run #2](https://github.com/JeanneBM/aks-readiness-diagnostic-agent/actions/runs/41471820620) on 2 November 2026.
 
 Evaluation supports 1–10 repetitions, per-case agreement and schema-2 development preregistration for new held-out data. Contract-invalid model output, including invented evidence IDs, counts as diagnostic risk; provider failures remain separate errors.
+
+## Preserved real recordings
+
+Eight anonymized Uvicorn/Go development cases are committed under [data/recorded-dev/2026-11-02-kind](data/recorded-dev/2026-11-02-kind). [Provenance and A1 results](eval/2026-11-02-kind) preserve the source run and original/published dataset hashes. A fresh replay on 5 November reproduced 24/24 correct A1 attempts, zero errors and zero unsupported conclusions.
+
+```bash
+python tools/run_local_lab.py pilot --cases data/recorded-dev/2026-11-02-kind --output .local/runs/recorded-a1-replay --variants A1 --repetitions 3
+```
+
+Replay needs no cluster or model credentials. The next experiment is repeated A1/C1/H on these same recordings with a configured provider; recording the eight cases again is unnecessary. These development results do not establish generalization or model superiority.
 
 ## Repository contents
 
