@@ -20,16 +20,29 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [python, go]
+        include:
+          - language: python
+            build-mode: none
+          - language: go
+            build-mode: manual
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        if: matrix.language == 'go'
+        with:
+          go-version-file: lab/go/go.mod
+          cache: false
       - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
         with:
           languages: ${{ matrix.language }}
-          build-mode: none
+          build-mode: ${{ matrix.build-mode }}
           queries: security-extended
+      - name: Build Go lab under CodeQL tracing
+        if: matrix.language == 'go'
+        working-directory: lab/go
+        run: go build ./...
       - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
         with:
           category: /language:${{ matrix.language }}
