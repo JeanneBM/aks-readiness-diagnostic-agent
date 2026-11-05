@@ -104,3 +104,7 @@ No Azure resources are provisioned or cluster permissions changed. Secret object
 The provider adapter has no automatic retries. Model calls may incur charges; CI and default commands never make them.
 
 Keep rules if they suffice. Use the model for explanations if that is its only demonstrated benefit. Automated remediation requires a separate safety and outcome evaluation.
+
+## Security
+
+[Security controls and verification](docs/security.md) describe the restricted collector RBAC, pinned Actions, CodeQL analysis, Trivy dependency/secret gates and disposable kind authorization checks. Scans do not replace evidence review or establish production readiness.
