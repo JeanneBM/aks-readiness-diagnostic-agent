@@ -71,8 +71,10 @@ def main(argv=None):
                 result, _ = client.diagnose(bundle)
             print(json.dumps(result.to_dict(), indent=2))
         return 0
-    except (ValueError, OSError, KeyError):
-        print("Operation failed: check arguments, evidence schema, permissions and provider configuration. Existing outputs are never overwritten.", file=sys.stderr)
+    except (ValueError, OSError, KeyError) as error:
+        # Messages raised in this package are fixed strings; provider bodies are never included.
+        print(f"Operation failed ({type(error).__name__}: {error}). Check arguments, evidence schema, "
+              "permissions and provider configuration. Existing outputs are never overwritten.", file=sys.stderr)
         return 2
 
 

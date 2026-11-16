@@ -1,0 +1,10 @@
+{
+  "cause": "insufficient_evidence",
+  "required_evidence_ids": [],
+  "split": "dev",
+  "origin": "synthetic-development",
+  "framework": "go",
+  "scenario": "timeout",
+  "cohort": "control",
+  "injected_fault": "timeout"
+}

@@ -1,0 +1,17 @@
+{
+  "status": "RECORDED",
+  "origin": "native-node-process",
+  "run": "dependency-down",
+  "port": 55053,
+  "env": {
+    "DEPENDENCY_URL": "http://127.0.0.1:38019/health"
+  },
+  "observed_http_status": {
+    "/live": 200,
+    "/ready": 503,
+    "/unknown": 404
+  },
+  "source_sha256": "54813926b926d76196a313abeb5c54f0234a4122e482e3bfc3c079b4e4c7340f",
+  "log_sha256": "df5f2bf48e58942fbc6c887a64455cea71bb1cda4db031791cd2bb600dab1cdd",
+  "node_version": "v22.23.4"
+}

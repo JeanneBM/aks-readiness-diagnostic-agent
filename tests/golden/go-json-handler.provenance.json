@@ -1,0 +1,23 @@
+{
+  "status": "RECORDED",
+  "origin": "native-go-process",
+  "port": 42485,
+  "observed_http_status": {
+    "/live": 200,
+    "/ready": 503,
+    "/unknown": 404
+  },
+  "env": {
+    "LOG_FORMAT": "json"
+  },
+  "source_sha256": "55980737ca98215be3b97ef9fd4c615e8381e5e8f2e77c790230b613cd74ba13",
+  "log_sha256": "b51ee069663214132b054fa875c1502d1d599c9d255e0cc2743913a692dfb95e",
+  "go_version": "go version go1.24.7 linux/amd64",
+  "capture": "local native process via tools/capture_go_logs.py, 16 November 2026; not a CI artifact",
+  "supersedes": {
+    "workflow_run_id": 40381715977,
+    "artifact_id": 12679415721,
+    "commit": "6d77333ea858eb3085ba7cefbe49285cc16e8815",
+    "reason": "lab/go/main.go gained LOG_FORMAT and READY_DELAY_SECONDS; the text output is unchanged"
+  }
+}

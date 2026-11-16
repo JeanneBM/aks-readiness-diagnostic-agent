@@ -1,0 +1,21 @@
+{
+  "cause": "probe_port_mismatch",
+  "required_evidence_ids": [
+    "probe",
+    "events"
+  ],
+  "split": "dev",
+  "origin": "synthetic-development",
+  "framework": "go-json",
+  "scenario": "port",
+  "cohort": "out-of-pattern",
+  "injected_fault": "port",
+  "evidence_options": [
+    [
+      "logs"
+    ],
+    [
+      "startup"
+    ]
+  ]
+}

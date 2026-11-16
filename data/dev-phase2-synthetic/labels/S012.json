@@ -1,0 +1,20 @@
+{
+  "cause": "dependency_unavailable",
+  "required_evidence_ids": [
+    "events"
+  ],
+  "split": "dev",
+  "origin": "synthetic-development",
+  "framework": "uvicorn-quiet",
+  "scenario": "dependency",
+  "cohort": "in-pattern",
+  "injected_fault": "dependency",
+  "evidence_options": [
+    [
+      "logs"
+    ],
+    [
+      "startup"
+    ]
+  ]
+}

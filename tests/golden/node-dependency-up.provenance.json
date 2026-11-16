@@ -1,0 +1,16 @@
+{
+  "status": "RECORDED",
+  "origin": "native-node-process",
+  "run": "dependency-up",
+  "port": 35295,
+  "env": {
+    "DEPENDENCY_URL": "http://127.0.0.1:42851/live"
+  },
+  "observed_http_status": {
+    "/live": 200,
+    "/ready": 200
+  },
+  "source_sha256": "54813926b926d76196a313abeb5c54f0234a4122e482e3bfc3c079b4e4c7340f",
+  "log_sha256": "3bd08031671cddcd5af9bbadd50572143a2961ce246446c092029361180b0d8a",
+  "node_version": "v22.23.4"
+}

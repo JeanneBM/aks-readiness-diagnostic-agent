@@ -1,2 +1,2 @@
-time=2026-10-26T18:53:48.882Z level=INFO msg="starting HTTP server" address=:39003 readiness_path=/ready role=api
-time=2026-10-26T18:53:48.935Z level=ERROR msg="dependency check failed" dependency=inventory err="Get \"http://127.0.0.1:58251/health\": dial tcp 127.0.0.1:58251: connect: connection refused"
+time=2026-11-16T11:40:44.221+01:00 level=INFO msg="starting HTTP server" address=:35067 readiness_path=/ready role=api
+time=2026-11-16T11:40:44.276+01:00 level=ERROR msg="dependency check failed" dependency=inventory err="Get \"http://127.0.0.1:33295/health\": dial tcp 127.0.0.1:33295: connect: connection refused"

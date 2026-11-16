@@ -1,0 +1,5 @@
+2026-11-16T10:43:18.766Z info  routes mounted: GET /live, GET /ready
+2026-11-16T10:43:18.768Z info  server listening on http://0.0.0.0:35295
+2026-11-16T10:43:18.787Z info  GET /live -> 200
+2026-11-16T10:43:18.790Z info  GET /live -> 200
+2026-11-16T10:43:18.800Z info  GET /ready -> 200

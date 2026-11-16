@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "target": "selected-pod/selected-container",
+  "observations": [
+    {
+      "id": "status",
+      "kind": "pod_status",
+      "source": "synthetic/pod/status",
+      "text": "Ready=False"
+    },
+    {
+      "id": "probe",
+      "kind": "probe_config",
+      "source": "synthetic/pod/spec/readinessProbe",
+      "text": "{\"path\": \"/ready\", \"port\": 9090, \"scheme\": \"HTTP\"}"
+    },
+    {
+      "id": "events",
+      "kind": "probe_result",
+      "source": "synthetic/pod/events/time-ordered",
+      "text": "Readiness probe failed: Get \"http://192.0.2.7:9090/ready\": dial tcp 192.0.2.7:9090: connect: connection refused"
+    },
+    {
+      "id": "logs",
+      "kind": "app_log",
+      "source": "synthetic/container/logs/recent-10m",
+      "text": "{\"time\":\"2026-11-16T11:40:44.289446035+01:00\",\"level\":\"INFO\",\"msg\":\"starting HTTP server\",\"address\":\":42485\",\"readiness_path\":\"/ready\",\"role\":\"api\"}\n"
+    },
+    {
+      "id": "startup",
+      "kind": "app_log",
+      "source": "synthetic/container/logs/available-prefix",
+      "text": "{\"time\":\"2026-11-16T11:40:44.289446035+01:00\",\"level\":\"INFO\",\"msg\":\"starting HTTP server\",\"address\":\":42485\",\"readiness_path\":\"/ready\",\"role\":\"api\"}\n"
+    },
+    {
+      "id": "snapshot-limit",
+      "kind": "limitation",
+      "source": "collector",
+      "text": "Sequential reads are not atomic. Logs may be stale or rotated; the prefix is the beginning of available current-container logs, not guaranteed original startup."
+    }
+  ]
+}

@@ -14,16 +14,19 @@ I have implemented a read-only diagnostic experiment: explicit rules, one-call m
 | 5 November 2026 | `eval/2026-11-05-kind-paired` | A1 24/24, C1 9/24 with ten provider errors, H 24/24 using only rules |
 | 5 November 2026 | [Security run 42099987269](https://github.com/JeanneBM/aks-readiness-diagnostic-agent/actions/runs/42099987269) | CodeQL Python/Go, Trivy dependency/secret gates, RBAC contracts and allowed/denied kind checks |
 | 5 November 2026 | `eval/2026-11-05-kind-paired/rubric-v2` | Post-hoc citation rescore: C1 conservative risk flags 6 → 3; accuracy and errors unchanged |
+| 16 November 2026 | `docs/phase-2-protocol.md`, `tools/phase2_gate.py`, `data/dev-phase2-synthetic` | Preregistered 13-case LLM-suitability design; offline: A1 3/3 in-pattern, 0/6 out-of-pattern, 4/4 control; H fallback wiring and gate verified with scripted models. No phase-2 recording or model request yet |
 
 ## Latest offline changes
 
 Provider errors preserve safe HTTP/transport metadata. Request pacing is configurable, with no automatic retries. Python code fingerprints normalize LF/CRLF; exact dataset hashes and Python patch-version checks remain strict. Old freezes must be regenerated after these implementation changes.
 
+Lab applications gained production-style variants without changing behaviour: Go `LOG_FORMAT=json`, Uvicorn `--log-level warning`, a plain Node service, and `READY_DELAY_SECONDS` for probe-timeout controls. Labels and replay rows carry a `cohort` field; `summary.json` reports `by_cohort`.
+
 Model citation schemas use only current bundle IDs. Displayed model recommendations come from fixed read-only templates; model-controlled summaries and uncertainty are still untrusted. Original pilot files remain unchanged. The revised rubric is a separately versioned development review.
 
 ## Remaining work
 
-1. Add sparse/default-log recordings and ambiguous controls without designing labels to force a model advantage; test H fallback offline.
+1. Record the phase-2 matrix in kind (`--matrix phase2`), commit the recording and the free A1 replay, then run the single preregistered paid A1/C1/H replay and the gate. Sparse-log and timeout controls, Go JSON logs and a Node service are in the matrix; labels follow the evidence, not the injection.
 2. Preserve readiness transition times, Event timing/counts and avoid duplicate log payloads. Review temporal conflict handling before live collection claims.
 3. Improve rules and model instructions fairly on development data. Review semantic evidence support separately from cause correctness and citation coverage.
 4. Add Entra model authentication; key-based access remains available locally.

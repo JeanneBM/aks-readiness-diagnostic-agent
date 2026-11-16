@@ -21,6 +21,12 @@ def capture(output):
     output.mkdir(parents=True, exist_ok=False)
     binary = output / ("server.exe" if os.name == "nt" else "server")
     subprocess.run(["go", "build", "-o", str(binary), "."], cwd=ROOT / "lab/go", check=True, timeout=180)
+    # The same binary is run twice: default text handler, then LOG_FORMAT=json.
+    run_process(binary, output / "server.log", output / "provenance.json", {})
+    run_process(binary, output / "server-json.log", output / "provenance-json.json", {"LOG_FORMAT": "json"})
+
+
+def run_process(binary, log_path, provenance_path, extra_env):
     with socket.socket() as listener:
         listener.bind(("127.0.0.1", 0))
         port = listener.getsockname()[1]
@@ -29,7 +35,7 @@ def capture(output):
         unavailable.bind(("127.0.0.1", 0))
         dependency_port = unavailable.getsockname()[1]
         env = {**os.environ, "PORT": str(port), "ROLE": "api", "READY_PATH": "/ready",
-               "DEPENDENCY_URL": f"http://127.0.0.1:{dependency_port}/health"}
+               "DEPENDENCY_URL": f"http://127.0.0.1:{dependency_port}/health", **extra_env}
         opener = build_opener(ProxyHandler({}))
         def status(path):
             try:
@@ -37,7 +43,6 @@ def capture(output):
                     return response.status
             except HTTPError as error:
                 return error.code
-        log_path = output / "server.log"
         with log_path.open("wb") as stream:
             process = subprocess.Popen([str(binary)], env=env, stdout=stream, stderr=subprocess.STDOUT)
             try:
@@ -62,12 +67,12 @@ def capture(output):
                     process.kill()
                     process.wait()
     provenance = {"status": "RECORDED", "origin": "native-go-process", "port": port,
-                  "observed_http_status": observed,
+                  "observed_http_status": observed, "env": extra_env,
                   "source_sha256": hashlib.sha256((ROOT / "lab/go/main.go").read_bytes()).hexdigest(),
                   "log_sha256": hashlib.sha256(log_path.read_bytes()).hexdigest(),
                   "go_version": subprocess.check_output(["go", "version"], text=True).strip()}
-    (output / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
-    print("Recorded actual Go logs in", output)
+    provenance_path.write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
+    print("Recorded actual Go logs in", log_path)
 
 
 if __name__ == "__main__":

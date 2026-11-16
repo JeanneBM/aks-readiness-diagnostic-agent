@@ -1,0 +1,17 @@
+{
+  "status": "RECORDED",
+  "origin": "native-node-process",
+  "run": "ready-delay",
+  "port": 38605,
+  "env": {
+    "DEPENDENCY_URL": "http://127.0.0.1:42851/live",
+    "READY_DELAY_SECONDS": "3"
+  },
+  "observed_http_status": {
+    "/live": 200,
+    "/ready": "client-timeout"
+  },
+  "source_sha256": "54813926b926d76196a313abeb5c54f0234a4122e482e3bfc3c079b4e4c7340f",
+  "log_sha256": "c188298f6c532acfe52dd0e4e08f67c0ea6468d14e9fc93db245756f259454f9",
+  "node_version": "v22.23.4"
+}
