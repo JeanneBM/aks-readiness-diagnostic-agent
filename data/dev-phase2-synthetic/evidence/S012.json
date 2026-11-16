@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "target": "selected-pod/selected-container",
+  "observations": [
+    {
+      "id": "status",
+      "kind": "pod_status",
+      "source": "synthetic/pod/status",
+      "text": "Ready=False"
+    },
+    {
+      "id": "probe",
+      "kind": "probe_config",
+      "source": "synthetic/pod/spec/readinessProbe",
+      "text": "{\"path\": \"/ready\", \"port\": 8080, \"scheme\": \"HTTP\"}"
+    },
+    {
+      "id": "events",
+      "kind": "probe_result",
+      "source": "synthetic/pod/events/time-ordered",
+      "text": "Readiness probe failed: HTTP probe failed with statuscode: 503"
+    },
+    {
+      "id": "logs",
+      "kind": "app_log",
+      "source": "synthetic/container/logs/recent-10m",
+      "text": "ERROR:    Readiness dependency inventory unavailable: <urlopen error [Errno 111] Connection refused>\n"
+    },
+    {
+      "id": "startup",
+      "kind": "app_log",
+      "source": "synthetic/container/logs/available-prefix",
+      "text": "ERROR:    Readiness dependency inventory unavailable: <urlopen error [Errno 111] Connection refused>\n"
+    },
+    {
+      "id": "snapshot-limit",
+      "kind": "limitation",
+      "source": "collector",
+      "text": "Sequential reads are not atomic. Logs may be stale or rotated; the prefix is the beginning of available current-container logs, not guaranteed original startup."
+    }
+  ]
+}

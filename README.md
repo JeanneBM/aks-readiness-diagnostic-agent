@@ -50,9 +50,23 @@ python tools/rescore_recorded_pilot.py --output .local/review/rubric-v2.json
 
 The original evidence, labels and result files remain unchanged. New model recommendations use fixed, read-only templates, while dynamic strict schemas restrict citation IDs to the current bundle. Summary and uncertainty text remain untrusted model output.
 
-## Next experiment
+## Phase 2: is a model suitable at all? (preregistered, not yet run)
 
-Record workloads with sparse/default logs and ambiguous controls; allow abstention when the evidence cannot identify a cause. Evaluate the cascade fallback with mocked tests first. Improve the rules and prompt fairly on development data, then freeze before independently prepared held-out data. No paid follow-up is part of the current checks.
+The first pilot could not answer the question this repository exists for, because every recorded case matched the rules' patterns and H never consulted the model. [docs/phase-2-protocol.md](docs/phase-2-protocol.md) preregisters a 13-case matrix in three cohorts, with the decision rule committed before any recording or model request:
+
+| Cohort | Cases | What the evidence looks like | Expected A1 | What the model must do |
+| --- | ---: | --- | --- | --- |
+| in-pattern | 3 | Formats the rules were written for | correct | match the rules |
+| out-of-pattern | 6 | Same faults; Go JSON logs and a Node service the rules do not parse | abstains | recover the cause with valid citations |
+| control | 4 | Probe timeouts and `--log-level warning` runs where no cause is supported | abstains | abstain, despite decoy signals |
+
+Verdicts are `SUITABLE_STANDALONE`, `SUITABLE_AS_FALLBACK`, `NOT_SUITABLE` or `INCONCLUSIVE`; `tools/phase2_gate.py` applies the thresholds mechanically. A negative result is published with the same prominence as a positive one. The matrix is recorded by the [kind phase 2 workflow](.github/workflows/kind-phase2.yml) (`--matrix phase2`); `data/dev-phase2-synthetic` is the same matrix assembled offline from real captured application logs for regression tests only, never for the reported result.
+
+```bash
+readiness-agent evaluate --cases data/dev-phase2-synthetic --variants A1 --output .local/runs/phase2-a1-offline
+```
+
+A1 solves 3 of 3 in-pattern cases, abstains on all 6 out-of-pattern cases and abstains correctly on all 4 controls. That is the floor the model is measured against.
 
 ## Run and inspect
 
@@ -61,6 +75,7 @@ Record workloads with sparse/default logs and ambiguous controls; allow abstenti
 - [Evaluation and freeze](docs/evaluation.md): code hashes normalize Python line endings; dataset bytes remain exact. Python patch versions stay strict.
 - [Security](docs/security.md): collector RBAC, CodeQL, Trivy and authorization checks.
 - [GitHub recording workflow](docs/github-actions-pilot.md): eight real development recordings and A1 replay.
+- [Phase 2 protocol](docs/phase-2-protocol.md): preregistered LLM-suitability matrix, thresholds and limits.
 
 ## Boundaries
 

@@ -50,6 +50,23 @@ class GoLogTests(unittest.TestCase):
                 self.assertEqual(diagnose(evidence).cause, cause)
                 self.assertEqual(recorder().supporting_log_options(evidence, scenario), [["startup"]])
 
+    def test_committed_actual_json_handler_capture(self):
+        """JSON output of the same binary: the recorder's go-json profile supports it; A1 does not."""
+        directory = ROOT / "tests/golden"
+        provenance = json.loads((directory / "go-json-handler.provenance.json").read_text())
+        raw = (directory / "go-json-handler.log").read_bytes()
+        self.assertEqual(provenance["env"], {"LOG_FORMAT": "json"})
+        self.assertEqual(provenance["log_sha256"], hashlib.sha256(raw).hexdigest())
+        self.assertEqual(provenance["source_sha256"], hashlib.sha256((ROOT / "lab/go/main.go").read_bytes()).hexdigest())
+        for line in raw.decode().splitlines():
+            self.assertIn("msg", json.loads(line))
+        for scenario in ("port", "path", "dependency"):
+            with self.subTest(scenario=scenario):
+                evidence = bundle(raw.decode(), provenance["port"], scenario)
+                self.assertEqual(diagnose(evidence).cause, "insufficient_evidence")
+                self.assertEqual(recorder().supporting_log_options(evidence, scenario, "go-json"), [["startup"]])
+                self.assertEqual(recorder().supporting_log_options(evidence, scenario, "go"), [])
+
     @unittest.skipUnless(os.environ.get("READINESS_GO_CAPTURE"), "requires fresh native Go capture; CI provides it")
     def test_actual_current_binary_output(self):
         directory = Path(os.environ["READINESS_GO_CAPTURE"])

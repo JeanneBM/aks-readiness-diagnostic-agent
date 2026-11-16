@@ -1,0 +1,2 @@
+{"time":"2026-11-16T11:40:44.289446035+01:00","level":"INFO","msg":"starting HTTP server","address":":42485","readiness_path":"/ready","role":"api"}
+{"time":"2026-11-16T11:40:44.340082232+01:00","level":"ERROR","msg":"dependency check failed","dependency":"inventory","err":"Get \"http://127.0.0.1:38963/health\": dial tcp 127.0.0.1:38963: connect: connection refused"}

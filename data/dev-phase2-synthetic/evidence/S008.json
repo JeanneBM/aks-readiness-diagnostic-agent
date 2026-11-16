@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "target": "selected-pod/selected-container",
+  "observations": [
+    {
+      "id": "status",
+      "kind": "pod_status",
+      "source": "synthetic/pod/status",
+      "text": "Ready=False"
+    },
+    {
+      "id": "probe",
+      "kind": "probe_config",
+      "source": "synthetic/pod/spec/readinessProbe",
+      "text": "{\"path\": \"/ready\", \"port\": 8080, \"scheme\": \"HTTP\"}"
+    },
+    {
+      "id": "events",
+      "kind": "probe_result",
+      "source": "synthetic/pod/events/time-ordered",
+      "text": "Readiness probe failed: HTTP probe failed with statuscode: 503"
+    },
+    {
+      "id": "logs",
+      "kind": "app_log",
+      "source": "synthetic/container/logs/recent-10m",
+      "text": "2026-11-16T10:43:18.477Z info  routes mounted: GET /live, GET /ready\n2026-11-16T10:43:18.478Z info  server listening on http://0.0.0.0:55053\n2026-11-16T10:43:18.503Z info  GET /live -> 200\n2026-11-16T10:43:18.506Z info  GET /live -> 200\n2026-11-16T10:43:18.514Z error readiness check failed: inventory unreachable (connect ECONNREFUSED 127.0.0.1:38019)\n2026-11-16T10:43:18.514Z info  GET /ready -> 503\n2026-11-16T10:43:18.515Z info  GET /unknown -> 404\n"
+    },
+    {
+      "id": "startup",
+      "kind": "app_log",
+      "source": "synthetic/container/logs/available-prefix",
+      "text": "2026-11-16T10:43:18.477Z info  routes mounted: GET /live, GET /ready\n2026-11-16T10:43:18.478Z info  server listening on http://0.0.0.0:55053\n2026-11-16T10:43:18.503Z info  GET /live -> 200\n2026-11-16T10:43:18.506Z info  GET /live -> 200\n2026-11-16T10:43:18.514Z error readiness check failed: inventory unreachable (connect ECONNREFUSED 127.0.0.1:38019)\n2026-11-16T10:43:18.514Z info  GET /ready -> 503\n2026-11-16T10:43:18.515Z info  GET /unknown -> 404\n"
+    },
+    {
+      "id": "snapshot-limit",
+      "kind": "limitation",
+      "source": "collector",
+      "text": "Sequential reads are not atomic. Logs may be stale or rotated; the prefix is the beginning of available current-container logs, not guaranteed original startup."
+    }
+  ]
+}

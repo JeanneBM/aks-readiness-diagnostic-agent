@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "target": "selected-pod/selected-container",
+  "observations": [
+    {
+      "id": "status",
+      "kind": "pod_status",
+      "source": "synthetic/pod/status",
+      "text": "Ready=False"
+    },
+    {
+      "id": "probe",
+      "kind": "probe_config",
+      "source": "synthetic/pod/spec/readinessProbe",
+      "text": "{\"path\": \"/ready\", \"port\": 9090, \"scheme\": \"HTTP\"}"
+    },
+    {
+      "id": "events",
+      "kind": "probe_result",
+      "source": "synthetic/pod/events/time-ordered",
+      "text": "Readiness probe failed: Get \"http://192.0.2.7:9090/ready\": dial tcp 192.0.2.7:9090: connect: connection refused"
+    },
+    {
+      "id": "logs-limit",
+      "kind": "limitation",
+      "source": "collector",
+      "text": "No log lines in the recent ten-minute window."
+    },
+    {
+      "id": "startup-limit",
+      "kind": "limitation",
+      "source": "collector",
+      "text": "No startup log lines were available."
+    },
+    {
+      "id": "snapshot-limit",
+      "kind": "limitation",
+      "source": "collector",
+      "text": "Sequential reads are not atomic. Logs may be stale or rotated; the prefix is the beginning of available current-container logs, not guaranteed original startup."
+    }
+  ]
+}

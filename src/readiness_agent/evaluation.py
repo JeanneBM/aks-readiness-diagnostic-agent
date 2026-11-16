@@ -13,6 +13,11 @@ from .llm import PROMPT, SCHEMA
 from .models import CAUSES, Bundle, Diagnosis
 
 
+# in-pattern: the rules were written for this evidence form. out-of-pattern: same fault
+# class, evidence the rules do not parse. control: the evidence supports no cause.
+COHORTS = ("in-pattern", "out-of-pattern", "control")
+
+
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -60,10 +65,13 @@ def load_cases(directory):
         bundle = Bundle.parse(json.loads(p.read_text(encoding="utf-8")))
         truth = json.loads((directory / "labels" / p.name).read_text(encoding="utf-8"))
         required = {"cause", "required_evidence_ids", "split", "origin"}
-        if not required <= set(truth) or set(truth) - required - {"framework", "scenario", "evidence_options"}:
+        optional = {"framework", "scenario", "evidence_options", "cohort", "injected_fault"}
+        if not required <= set(truth) or set(truth) - required - optional:
             raise ValueError("Invalid ground-truth contract")
         if truth["cause"] not in CAUSES or truth["split"] not in ("dev", "held-out"):
             raise ValueError("Invalid ground-truth taxonomy or split")
+        if truth.get("cohort", "in-pattern") not in COHORTS:
+            raise ValueError("Invalid cohort label")
         ids = truth["required_evidence_ids"]
         if (not isinstance(ids, list) or any(not isinstance(i, str) for i in ids)
                 or len(ids) != len(set(ids)) or not set(ids) <= {o.id for o in bundle.observations}):
@@ -122,7 +130,8 @@ def case_consistency(rows):
         result.append({"case_id": case_id, "variant": variant, "repetitions": len(data),
                        "cause_counts": dict(counts), "valid_responses": sum(counts.values()),
                        "cause_agreement": count / len(data), "majority_cause": majority,
-                       "ground_truth": data[0]["ground_truth"],
+                       "ground_truth": data[0]["ground_truth"], "cohort": data[0].get("cohort", "in-pattern"),
+                       "model_calls": sum(r.get("model_calls", 0) for r in data),
                        "cause_correct": majority == data[0]["ground_truth"],
                        "any_diagnostic_risk": any(r.get("diagnostic_risk", False) for r in data)})
     return result
@@ -168,6 +177,7 @@ def evaluate(cases_path, output, variants, client=None, manifest=None, repetitio
                 started = time.perf_counter()
                 row = {"case_id": case_id, "variant": variant, "repetition": repetition,
                        "split": truth["split"], "framework": truth.get("framework", "unspecified"),
+                       "cohort": truth.get("cohort", "in-pattern"),
                        "ground_truth": truth["cause"], "status": "ERROR", "usage": {}, "model_calls": 0,
                        "rubric_evidence_covered": False if truth["required_evidence_ids"] or truth.get("evidence_options") else None,
                        "diagnostic_risk": False, "unsupported_conclusion": False}
@@ -230,10 +240,31 @@ def evaluate(cases_path, output, variants, client=None, manifest=None, repetitio
             "attempts": sum(x["framework"] == framework for x in data),
             "correct_attempts": sum(x["framework"] == framework and x.get("cause_correct", False) for x in data)}
             for framework in sorted({x["framework"] for x in data})}
+        entry["by_cohort"] = {}
+        for name in COHORTS:
+            group = [x for x in cases_data if x["cohort"] == name]
+            attempts = [x for x in data if x["cohort"] == name]
+            if not group:
+                continue
+            entry["by_cohort"][name] = {
+                "cases": len(group), "correct": sum(x["cause_correct"] for x in group),
+                "diagnostic_risk_cases": sum(x["any_diagnostic_risk"] for x in group),
+                "attempts": len(attempts),
+                "correct_attempts": sum(x.get("cause_correct", False) for x in attempts),
+                "unsupported_conclusions": sum(x["unsupported_conclusion"] for x in attempts),
+                "provider_errors": sum(x.get("error_kind") == "PROVIDER_ERROR" for x in attempts),
+                "model_calls": sum(x["model_calls"] for x in attempts)}
         summary["variants"][variant] = entry
         lines.append(f"| {variant} | {entry['cases']} | {entry['correct']} | {entry['attempts']} | {entry['errors']} | {entry['contract_errors']} | {entry['model_no_answers']} | {entry['diagnostic_risk_attempts']} | {entry['model_calls']} |")
     summary["paired_comparisons"] = {v: paired_comparison(consistent, v)
                                      for v in variants if v != "A1" and "A1" in variants}
+    if len({x["cohort"] for x in consistent}) > 1:
+        lines += ["", "Per cohort; the cohort label describes the evidence form, not difficulty.", "",
+                  "| Variant | Cohort | Cases | Majority-correct | Risk cases | Provider errors | Model calls |",
+                  "| --- | --- | ---: | ---: | ---: | ---: | ---: |"]
+        for variant in variants:
+            for name, c in summary["variants"][variant]["by_cohort"].items():
+                lines.append(f"| {variant} | {name} | {c['cases']} | {c['correct']} | {c['diagnostic_risk_cases']} | {c['provider_errors']} | {c['model_calls']} |")
     save("summary.json", summary)
     (output / "summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     return summary

@@ -1,0 +1,12 @@
+{
+  "cause": "healthy",
+  "required_evidence_ids": [
+    "status"
+  ],
+  "split": "dev",
+  "origin": "synthetic-development",
+  "framework": "go-json",
+  "scenario": "healthy",
+  "cohort": "in-pattern",
+  "injected_fault": "healthy"
+}

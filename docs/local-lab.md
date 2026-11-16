@@ -41,6 +41,14 @@ It builds and loads the two images, starts a separate HTTP dependency and record
 | Path | Probe targets an unregistered path | Readiness HTTP 404 Event |
 | Dependency | Scale the real dependency Deployment to zero | Readiness HTTP 503 Event |
 
+### Phase-2 matrix
+
+```bash
+python tools/run_local_lab.py record --create-cluster --matrix phase2 --output .local/recordings/phase2-001 --allow-local-lab
+```
+
+Records the 13 preregistered cases from [docs/phase-2-protocol.md](phase-2-protocol.md): the same images plus `readiness-diag-node:dev`, run under application profiles (`go-json`, `node`, `uvicorn-quiet`) and one extra injection (`timeout`: the readiness handler sleeps 10 s against a 3 s probe timeout). Labels carry `cohort` and `injected_fault`; a fault whose supporting log is absent from the bundle is labelled `insufficient_evidence`. The default `--matrix dev-v1` is unchanged.
+
 Application readiness checks actually request the separate dependency over HTTP. Unlike demo/app.py, these apps do not simulate the dependency result with a boolean. Go uses net/http and structured slog output; Uvicorn provides its own server startup output and serves the ASGI application.
 
 The application logs its configured readiness route explicitly. That route message is application-provided evidence, not framework magic or independent proof. The baseline includes known development patterns for both frameworks. Matching these eight cases does not show generalization.

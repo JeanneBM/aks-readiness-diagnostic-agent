@@ -1,0 +1,153 @@
+name: Readiness kind phase 2
+# Records the preregistered 13-case matrix (docs/phase-2-protocol.md) on a dedicated kind
+# cluster and replays A1 for free. The paid A1/C1/H run and the decision gate execute only
+# when the dispatcher sets allow_model_calls=true AND the three provider secrets exist.
+on:
+  workflow_dispatch:
+    inputs:
+      allow_model_calls:
+        description: "Run the chargeable A1,C1,H replay and the phase-2 gate"
+        type: boolean
+        default: false
+      freeze_manifest:
+        description: "Repository path of the development freeze (schema 2) to enforce; empty = no manifest"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: readiness-kind-phase2-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  phase2:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      KIND_EXPERIMENTAL_PROVIDER: docker
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: stable
+          cache: false
+      - name: Install kind and Python package
+        run: |
+          go install sigs.k8s.io/kind@v0.33.0
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+          python -m pip install -e .
+      - name: Check runner prerequisites
+        run: |
+          mkdir -p .local/diagnostics
+          python tools/run_local_lab.py check
+          git rev-parse HEAD > .local/diagnostics/source-commit.txt
+          docker version > .local/diagnostics/docker-version.txt
+          kind version > .local/diagnostics/kind-version.txt
+          kubectl version --client -o json > .local/diagnostics/kubectl-version.json
+      - name: Offline regression checks
+        run: python -m unittest discover -s tests -v
+      - name: Record the 13-case phase-2 matrix
+        run: |
+          set -o pipefail
+          python tools/run_local_lab.py record --create-cluster --matrix phase2 --output .local/recordings/phase2-001 --allow-local-lab 2>&1 | tee .local/diagnostics/record.log
+      - name: Replay A1 three times per case (no model)
+        run: |
+          set -o pipefail
+          python tools/run_local_lab.py pilot --cases .local/recordings/phase2-001 --output .local/runs/phase2-a1-001 --variants A1 --repetitions 3 2>&1 | tee .local/diagnostics/pilot-a1.log
+      - name: Verify the recording matches the preregistered design
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          recording = json.loads(Path(".local/recordings/phase2-001/recording.json").read_text())
+          summary = json.loads(Path(".local/runs/phase2-a1-001/summary.json").read_text())
+          assert recording["status"] == "RECORDED", recording
+          assert recording["matrix"] == "phase2" and len(recording["cases"]) == 13, recording
+          cohorts = {}
+          for case in recording["cases"]:
+              cohorts[case["cohort"]] = cohorts.get(case["cohort"], 0) + 1
+          assert cohorts == {"in-pattern": 3, "out-of-pattern": 6, "control": 4}, cohorts
+          a1 = summary["variants"]["A1"]
+          by = a1["by_cohort"]
+          assert a1["model_calls"] == 0 and a1["errors"] == 0, a1
+          # Preregistered expectation: rules solve in-pattern, abstain elsewhere, never conclude unsupported.
+          assert by["in-pattern"]["correct"] == 3, by
+          assert by["out-of-pattern"]["correct"] == 0, by
+          assert by["control"]["correct"] == 4, by
+          assert a1["unsupported_conclusions"] == 0, a1
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as report:
+              report.write("# Phase 2 recording: A1 replay\n\n")
+              report.write("13 real kind cases; 3 repetitions. A1 by cohort (majority-correct/cases): ")
+              report.write(", ".join(f"{k} {v['correct']}/{v['cases']}" for k, v in by.items()) + "\n")
+          PY
+      - name: Decide whether the paid replay runs
+        id: paid
+        env:
+          HAS_ENDPOINT: ${{ secrets.READINESS_ENDPOINT != '' }}
+          HAS_KEY: ${{ secrets.READINESS_API_KEY != '' }}
+          HAS_MODEL: ${{ secrets.READINESS_MODEL != '' }}
+          ALLOW: ${{ inputs.allow_model_calls }}
+        run: |
+          if [ "$ALLOW" = "true" ] && [ "$HAS_ENDPOINT" = "true" ] && [ "$HAS_KEY" = "true" ] && [ "$HAS_MODEL" = "true" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Paid replay skipped: allow_model_calls=$ALLOW, secrets present: endpoint=$HAS_ENDPOINT key=$HAS_KEY model=$HAS_MODEL" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Paid replay A1,C1,H and preregistered gate
+        if: steps.paid.outputs.run == 'true'
+        env:
+          READINESS_ENDPOINT: ${{ secrets.READINESS_ENDPOINT }}
+          READINESS_API_KEY: ${{ secrets.READINESS_API_KEY }}
+          READINESS_MODEL: ${{ secrets.READINESS_MODEL }}
+          READINESS_PROVIDER: ${{ vars.READINESS_PROVIDER || 'azure' }}
+          READINESS_API_VERSION: ${{ vars.READINESS_API_VERSION || '2024-10-21' }}
+          READINESS_TOKEN_PARAMETER: ${{ vars.READINESS_TOKEN_PARAMETER || 'max_tokens' }}
+          READINESS_TEMPERATURE: ${{ vars.READINESS_TEMPERATURE || '0' }}
+          READINESS_MIN_REQUEST_INTERVAL_SECONDS: ${{ vars.READINESS_MIN_REQUEST_INTERVAL_SECONDS || '1' }}
+          FREEZE: ${{ inputs.freeze_manifest }}
+        run: |
+          set -o pipefail
+          MANIFEST=()
+          if [ -n "$FREEZE" ]; then MANIFEST=(--manifest "$FREEZE"); fi
+          readiness-agent evaluate --cases .local/recordings/phase2-001 --output .local/runs/phase2-paired-001 \
+            --variants A1,C1,H --repetitions 3 --allow-model-calls "${MANIFEST[@]}" 2>&1 | tee .local/diagnostics/pilot-paired.log || true
+          python tools/phase2_gate.py --run .local/runs/phase2-paired-001 --output .local/runs/phase2-paired-001/gate.json | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Preserve cluster diagnostics
+        if: always()
+        timeout-minutes: 3
+        run: |
+          mkdir -p .local/diagnostics
+          if command -v kind >/dev/null && kind get clusters | grep -qx readiness-diag; then
+            kind export logs .local/diagnostics/kind --name readiness-diag
+          fi
+      - name: Upload recordings, results and diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: readiness-kind-phase2-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            .local/recordings/
+            .local/runs/
+            .local/diagnostics/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Delete dedicated runner cluster
+        if: always()
+        timeout-minutes: 3
+        run: |
+          if command -v kind >/dev/null && kind get clusters | grep -qx readiness-diag; then
+            kind delete cluster --name readiness-diag
+          fi

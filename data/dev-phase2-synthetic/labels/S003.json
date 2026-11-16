@@ -1,0 +1,21 @@
+{
+  "cause": "probe_path_mismatch",
+  "required_evidence_ids": [
+    "probe",
+    "events"
+  ],
+  "split": "dev",
+  "origin": "synthetic-development",
+  "framework": "go-json",
+  "scenario": "path",
+  "cohort": "out-of-pattern",
+  "injected_fault": "path",
+  "evidence_options": [
+    [
+      "logs"
+    ],
+    [
+      "startup"
+    ]
+  ]
+}
