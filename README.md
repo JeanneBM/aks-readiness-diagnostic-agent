@@ -14,16 +14,25 @@ Eight instrumented Uvicorn/Go cases, three repetitions each. **These results do 
 
 [Original pilot and provenance](eval/2026-11-05-kind-paired) · [Post-hoc citation review](eval/2026-11-05-kind-paired/rubric-v2) · [Current status](docs/status.md)
 
-## Diagnostic flow
+## Architecture
+
+Read-only collection feeds the same evidence to rules (A1), a model (C1) or a rules-first cascade (H). Replay uses recorded evidence without cluster access. No branch executes a repair.
 
 ```mermaid
 flowchart TD
-    E["Recorded evidence"] --> R["Rules: A1 or H"]
-    E --> C["Model: C1"]
+  K8S[("Kubernetes API")] -->|"read-only kubectl"| COL["Evidence collector"]
+  COL --> B[("Recorded evidence bundle")]
+  subgraph LOCAL["Local diagnosis and evaluation"]
+    B --> R["A1 rules or H rules-first"]
+    B --> C["C1 model diagnosis"]
     R -->|"H abstains"| C
-    R -->|"A1 result or H decision"| V["Validate and score"]
+    R --> V["Validate contract and score against labels"]
     C --> V
-    V --> O["Diagnosis, citations, fixed advice"]
+    V --> OUT["Diagnosis, cited evidence and fixed advice"]
+    V --> REPORT["Per-run evaluation report"]
+  end
+  C --> MODEL["Optional Azure OpenAI or OpenAI"]
+  MODEL --> C
 ```
 
 Evidence and ground-truth labels stay separate. Scoring distinguishes cause correctness and citation coverage; a valid evidence ID alone does not prove semantic support. Provider failures stay in the denominator. Repetitions measure consistency, while paired comparisons use eight cases, not 24 independent samples.
